@@ -1,0 +1,17 @@
+{
+  "name": "decebot",
+  "version": "1.0.0",
+  "description": "A bot for twitch.tv/itsdece",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "play-sound": "^1.1.3",
+    "say": "^0.16.0",
+    "tmi": "^2.0.0",
+    "tmi.js": "^1.4.5"
+  }
+}
