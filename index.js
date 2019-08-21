@@ -1,9 +1,9 @@
 var tmi = require('tmi.js');
 var say = require('say');
 var player = require('play-sound')(opts = {});
-var rf = require('random-facts'); // Require the package
+var rf = require('random-facts');
 const SoundEffect = require('./SoundEffect.js')
-const TwitchClient = require('twitch').default;
+const TwitchClient = require('twitch').default; //https://www.npmjs.com/package/twitch
 
 var options = {
 	options: {
@@ -40,7 +40,7 @@ var sayTimeoutList = {};
 
 client.on("chat", function(channel, userstate, message, self) {
 	console.log(userstate);
-
+	TwitchClient.getUser(userstate["user-id"]);
 	if(message.includes("!say")) {
 		speakText(userstate.username, message.replace("!say", ""));
 	} else if (message.includes("!randomfact")) {
