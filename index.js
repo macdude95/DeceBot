@@ -2,6 +2,10 @@ var tmi = require('tmi.js');
 var say = require('say');
 var player = require('play-sound')(opts = {});
 var rf = require('random-facts'); // Require the package
+const SoundEffect = require('./SoundEffect.js')
+var twitchAPI = require('twitch-api-v5');
+ 
+twitchAPI.clientID = 'Twitch app client-id';
 
 var options = {
 	options: {
@@ -25,54 +29,57 @@ client.on("connected", function(a,p) {
 	client.action("itsdece", "SUP WORLD!");
 });
 
-var sound_effects = {
-	"Tuturu": {
-		path: "Tuturu.mp3",
-		userPermissionsList: []
-	}, 
-	"Oof": {
-		path: "Roblox Death Sound Effect.mp3",
-		userPermissionsList: []
-	}, 
-	"MonkaGigaDude": {
-		path: "monka giga dude.mp3",
-		userPermissionsList: ["itsdece", "br4c3_dk"]
-	}, 
-	"MissedIt": {
-		path: "missed it by that much.mp3",
-		userPermissionsList: []
-	}, 
-	"Dust": {
-		path: "another one bites the dust.mp3",
-		userPermissionsList: []
-	}, 
+var soundEffects = {
+	"!Tuturu": new SoundEffect("!Tuturu", "Tuturu.mp3"),
+	"!Oof": new SoundEffect("!Oof", "Roblox Death Sound Effect.mp3"),
+	"!MonkaGigaDude": new SoundEffect("!MonkaGigaDude", "monka giga dude.mp3", ["itsdece", "br4c3_dk"]),
+	"!MissedIt": new SoundEffect("!MissedIt", "missed it by that much.mp3"),
+	"!Dust": new SoundEffect("!Dust", "another one bites the dust.mp3")
 };
 
 var sayTimeout = 60000;
 var sayTimeoutList = {};
 
 client.on("chat", function(channel, userstate, message, self) {
+	console.log(userstate);
+	twitchAPI.user.getByID({ userID: userstate["user-id"] }, (err, res) => {
+	    if(err) {
+	        console.log(err);
+	    } else {
+	        console.log(res);
+	        /* Example response
+	        {
+	            display_name: 'Twitch',
+	            _id: '12826',
+	            name: 'twitch',
+	            type: 'user',
+	            ...
+	        }
+	        */
+	    }
+	});
 	if(message.includes("!say")) {
-		speak_text(userstate.username, message.replace("!say", ""));
+		speakText(userstate.username, message.replace("!say", ""));
 	} else if (message.includes("!randomfact")) {
 		client.action("itsdece", rf.randomFact());
-	} else if (sound_effect_command_in_message(message) != "") {
-		play_sound(sound_effect_command_in_message(message), userstate.username);
+	} else if (soundEffectCommandInMessage(message)) {
+		playSound(soundEffectCommandInMessage(message), userstate.username);
 	} else {
 		//console.log("Nothing to do here...");
 	}
 });
 
-function sound_effect_command_in_message(message) {
-	for (const key of Object.keys(sound_effects)) {
-		if (message.toLowerCase().includes("!" + key.toLowerCase())) {
-			return sound_effects[key];
+function soundEffectCommandInMessage(message) {
+	for (const key of Object.keys(soundEffects)) {
+		if (message.toLowerCase().includes(key.toLowerCase())) {
+			return soundEffects[key];
 		}
 	}
-	return "";
+	return null;
 }
 
-function speak_text(username, message) {
+function speakText(username, message) {
+	if (message.length)
 	if (sayTimeoutList[username]) {
 		var lastTime = sayTimeoutList[username];
 		var elapsedTime = Date.now() - lastTime;
@@ -82,24 +89,27 @@ function speak_text(username, message) {
 		}
 	}
 	sayTimeoutList[username] = Date.now();
-	say.speak(username + " says: " + message, "Microsoft Zira Desktop");
+	say.speak(username + " says: " + message, "Microsoft Zira Desktop", 1.0, function(err){
+		if (err) {
+			console.log(`FAILED attempt to speak: ${message}`)
+		} else {
+			console.log(`SUCCESS text to speech: ${message}`)
+		}
+	});
 }
 
-function user_is_allowed_to_use_sound_effect(sound_effect, username) {
-	if (!sound_effect.userPermissionsList.length) {
-		return true;
-	} 
-	return sound_effect.userPermissionsList.includes(username);
-}
-
-function play_sound(sound_effect, username) {
-	if (!user_is_allowed_to_use_sound_effect(sound_effect, username)) {
+function playSound(soundEffect, username) {
+	if (!soundEffect.isAllowedFor(username)) {
 		return;
 	}
 
 	var pathToSoundEffects = "C:\\Users\\Michael\\Desktop\\StreamStuff\\SoundEffects\\";
 
-	player.play(pathToSoundEffects + sound_effect.path, function(err){
-	  if (err) throw err
+	player.play(pathToSoundEffects + soundEffect.filePath, function(err){
+		if (err) {
+			console.log(`FAILED attempt to play: ${soundEffect.filePath}`)
+		} else {
+			console.log(`SUCCESS played audio: ${soundEffect.filePath}`)
+		}
 	});
 }
