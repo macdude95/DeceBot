@@ -3,9 +3,7 @@ var say = require('say');
 var player = require('play-sound')(opts = {});
 var rf = require('random-facts'); // Require the package
 const SoundEffect = require('./SoundEffect.js')
-var twitchAPI = require('twitch-api-v5');
- 
-twitchAPI.clientID = 'Twitch app client-id';
+const TwitchClient = require('twitch').default;
 
 var options = {
 	options: {
@@ -42,22 +40,7 @@ var sayTimeoutList = {};
 
 client.on("chat", function(channel, userstate, message, self) {
 	console.log(userstate);
-	twitchAPI.user.getByID({ userID: userstate["user-id"] }, (err, res) => {
-	    if(err) {
-	        console.log(err);
-	    } else {
-	        console.log(res);
-	        /* Example response
-	        {
-	            display_name: 'Twitch',
-	            _id: '12826',
-	            name: 'twitch',
-	            type: 'user',
-	            ...
-	        }
-	        */
-	    }
-	});
+
 	if(message.includes("!say")) {
 		speakText(userstate.username, message.replace("!say", ""));
 	} else if (message.includes("!randomfact")) {
