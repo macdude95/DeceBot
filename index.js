@@ -62,6 +62,7 @@ function soundEffectCommandInMessage(message) {
 }
 
 function speakText(username, message) {
+	// TODO: Limit spoken text to certain character length, and only allow natural langauge of at least some minimum score.
 	if (message.length)
 	if (sayTimeoutList[username]) {
 		var lastTime = sayTimeoutList[username];
