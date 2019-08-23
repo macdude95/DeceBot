@@ -38,11 +38,11 @@ var sayTimeout = 60000;
 var sayTimeoutList = {};
 
 client.on("chat", function(channel, userstate, message, self) {
-    // console.log(userstate);
+    console.log(userstate);
     // TwitchClient.getUser(userstate["user-id"]);
     if(message.includes("!discord")) {
         chat("Join the discord here: https://discord.gg/65jUQ8G")
-    } if(message.includes("!say")) {
+    } else if(message.includes("!say") && userstate.username != "decebot") {
         speakText(userstate.username, message.replace("!say", ""));
     } else if (soundEffectCommandInMessage(message)) {
         soundEffectCommandInMessage(message).playSound(userstate.username);
