@@ -1,7 +1,20 @@
 var tmi = require('tmi.js');
 var say = require('say');
 const SoundEffect = require('./SoundEffect.js')
-// uc83kc9uo4u90x2psnm7jyxvlv833i
+const TwitchJs = require('twitch-js').default; // CONSIDER REPLACING TMI WITH THIS. example: https://github.com/twitch-devs/twitch-js/blob/next/examples/runkit.js
+const token = "uc83kc9uo4u90x2psnm7jyxvlv833i";
+const username = "ItsDece";
+// twitch api token: 
+
+// Instantiate clients.
+const { api, chat, chatConstants } = new TwitchJs({ token, username });
+
+// Get featured streams.
+api.get('streams/featured').then(response => {
+  console.log(response);
+  // Do stuff ...
+});
+
 
 var options = {
     options: {
@@ -23,7 +36,7 @@ client.connect();
 
 
 client.on("connected", function(a,p) {
-    chat("SUP WORLD!");
+    sayInChat("SUP WORLD!");
 });
 
 var soundEffects = {
@@ -41,7 +54,7 @@ client.on("chat", function(channel, userstate, message, self) {
     console.log(userstate);
     // TwitchClient.getUser(userstate["user-id"]);
     if(message.includes("!discord")) {
-        chat("Join the discord here: https://discord.gg/65jUQ8G")
+        sayInChat("Join the discord here: https://discord.gg/65jUQ8G")
     } else if(message.includes("!say") && userstate.username != "decebot") {
         speakText(userstate.username, message.replace("!say", ""));
     } else if (soundEffectCommandInMessage(message)) {
@@ -60,7 +73,7 @@ function soundEffectCommandInMessage(message) {
     return null;
 }
 
-function chat(message) {
+function sayInChat(message) {
     client.say("itsdece", message);
     // client.action("itsdece", message);
 }
@@ -74,7 +87,7 @@ function speakText(username, message) {
         var lastTime = sayTimeoutList[username];
         var elapsedTime = Date.now() - lastTime;
         if (elapsedTime < sayTimeout) {
-            chat(`Yo ${username}, chill out with the !say command for at least another ${Math.ceil((sayTimeout - elapsedTime)/1000)} seconds`);
+            sayInChat(`Yo ${username}, chill out with the !say command for at least another ${Math.ceil((sayTimeout - elapsedTime)/1000)} seconds`);
             return;
         }
     }
@@ -90,7 +103,7 @@ function speakText(username, message) {
     setTimeout(() => {
       say.stop((err) => {
         if (!err) {
-          chat(`@${username} your message was too long so I had to cut off.`)
+          sayInChat(`@${username} your message was too long so I had to cut off.`)
         }        
       });
     }, 5000)
