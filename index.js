@@ -23,7 +23,7 @@ var client = new tmi.client(options);
 client.connect();
 
 client.on("connected", function(a,p) {
-    client.action("itsdece", "SUP WORLD!");
+    chat("SUP WORLD!");
 });
 
 var soundEffects = {
@@ -73,7 +73,7 @@ function speakText(username, message) {
         var lastTime = sayTimeoutList[username];
         var elapsedTime = Date.now() - lastTime;
         if (elapsedTime < sayTimeout) {
-            client.action("itsdece", `Yo ${username}, chill out with the !say command for at least another ${Math.ceil((sayTimeout - elapsedTime)/1000)} seconds`);
+            chat(`Yo ${username}, chill out with the !say command for at least another ${Math.ceil((sayTimeout - elapsedTime)/1000)} seconds`);
             return;
         }
     }
