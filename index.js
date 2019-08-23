@@ -1,8 +1,7 @@
 var tmi = require('tmi.js');
 var say = require('say');
-var rf = require('random-facts');
 const SoundEffect = require('./SoundEffect.js')
-const TwitchClient = require('twitch').default; //https://www.npmjs.com/package/twitch
+uc83kc9uo4u90x2psnm7jyxvlv833i
 
 var options = {
     options: {
@@ -22,6 +21,7 @@ var options = {
 var client = new tmi.client(options);
 client.connect();
 
+
 client.on("connected", function(a,p) {
     chat("SUP WORLD!");
 });
@@ -40,10 +40,10 @@ var sayTimeoutList = {};
 client.on("chat", function(channel, userstate, message, self) {
     // console.log(userstate);
     // TwitchClient.getUser(userstate["user-id"]);
-    if(message.includes("!say")) {
+    if(message.includes("!discord")) {
+        chat("Join the discord here: https://discord.gg/65jUQ8G")
+    } if(message.includes("!say")) {
         speakText(userstate.username, message.replace("!say", ""));
-    } else if (message.includes("!randomfact")) {
-        chat(rf.randomFact());
     } else if (soundEffectCommandInMessage(message)) {
         soundEffectCommandInMessage(message).playSound(userstate.username);
     } else {
@@ -61,7 +61,8 @@ function soundEffectCommandInMessage(message) {
 }
 
 function chat(message) {
-    client.action("itsdece", message);
+    client.say("itsdece", message);
+    // client.action("itsdece", message);
 }
 
 function speakText(username, message) {
