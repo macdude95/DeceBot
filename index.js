@@ -1,7 +1,7 @@
 var tmi = require('tmi.js');
 var say = require('say');
 const SoundEffect = require('./SoundEffect.js')
-uc83kc9uo4u90x2psnm7jyxvlv833i
+// uc83kc9uo4u90x2psnm7jyxvlv833i
 
 var options = {
     options: {
@@ -79,7 +79,7 @@ function speakText(username, message) {
         }
     }
     sayTimeoutList[username] = Date.now();
-    say.speak(message, "Alex", 1.0, function(err){
+    say.speak(message, "Microsoft Zira Desktop", 1.0, function(err){
         if (err) {
             console.log(`FAILED attempt to speak: ${message}`)
         } else {
