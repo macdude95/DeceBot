@@ -1,6 +1,5 @@
 var tmi = require('tmi.js');
 var say = require('say');
-var player = require('play-sound')(opts = {});
 var rf = require('random-facts');
 const SoundEffect = require('./SoundEffect.js')
 const TwitchClient = require('twitch').default; //https://www.npmjs.com/package/twitch
@@ -44,9 +43,9 @@ client.on("chat", function(channel, userstate, message, self) {
     if(message.includes("!say")) {
         speakText(userstate.username, message.replace("!say", ""));
     } else if (message.includes("!randomfact")) {
-        client.action("itsdece", rf.randomFact());
+        chat(rf.randomFact());
     } else if (soundEffectCommandInMessage(message)) {
-        playSound(soundEffectCommandInMessage(message), userstate.username);
+        soundEffectCommandInMessage(message).playSound(userstate.username);
     } else {
         //console.log("Nothing to do here...");
     }
@@ -61,9 +60,15 @@ function soundEffectCommandInMessage(message) {
     return null;
 }
 
+function chat(message) {
+    client.action("itsdece", message);
+}
+
 function speakText(username, message) {
-    // TODO: Limit spoken text to certain character length, and only allow natural langauge of at least some minimum score.
-    if (message.length)
+    // Idea: https://github.com/axa-group/nlp.js/blob/HEAD/docs/binary-relevance-nlu.md
+    if (!message.length) {
+        return
+    }
     if (sayTimeoutList[username]) {
         var lastTime = sayTimeoutList[username];
         var elapsedTime = Date.now() - lastTime;
@@ -73,7 +78,7 @@ function speakText(username, message) {
         }
     }
     sayTimeoutList[username] = Date.now();
-    say.speak(message, "Microsoft Zira Desktop", 1.0, function(err){
+    say.speak(message, "Alex", 1.0, function(err){
         if (err) {
             console.log(`FAILED attempt to speak: ${message}`)
         } else {
@@ -84,24 +89,8 @@ function speakText(username, message) {
     setTimeout(() => {
       say.stop((err) => {
         if (!err) {
-          console.log('Stopped Speech');
+          chat(`@${username} your message was too long so I had to cut off.`)
         }        
       });
-    }, 2000)
-}
-
-function playSound(soundEffect, username) {
-    if (!soundEffect.isAllowedFor(username)) {
-        return;
-    }
-
-    var pathToSoundEffects = "C:\\Users\\Michael\\Desktop\\StreamStuff\\SoundEffects\\";
-
-    player.play(pathToSoundEffects + soundEffect.filePath, function(err){
-        if (err) {
-            console.log(`FAILED attempt to play: ${soundEffect.filePath}`)
-        } else {
-            console.log(`SUCCESS played audio: ${soundEffect.filePath}`)
-        }
-    });
+    }, 5000)
 }
