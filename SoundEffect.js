@@ -15,17 +15,18 @@ class SoundEffect {
     }
 
     playSound(username) {
+        var filePath = this.filePath;
         if (!this.isAllowedFor(username)) {
             return;
         }
 
         var pathToSoundEffects = "C:\\Users\\Michael\\Desktop\\StreamStuff\\SoundEffects\\";
 
-        player.play(pathToSoundEffects + this.filePath, function(err){
+        player.play(pathToSoundEffects + filePath, function(err){
             if (err) {
-                console.log(`FAILED attempt to play: ${this.filePath}`)
+                console.log(`FAILED attempt to play: ${filePath}`)
             } else {
-                console.log(`SUCCESS played audio: ${this.filePath}`)
+                console.log(`SUCCESS played audio: ${filePath}`)
             }
         });
     }

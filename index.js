@@ -1,19 +1,19 @@
 var tmi = require('tmi.js');
 var say = require('say');
 const SoundEffect = require('./SoundEffect.js')
-const TwitchJs = require('twitch-js').default; // CONSIDER REPLACING TMI WITH THIS. example: https://github.com/twitch-devs/twitch-js/blob/next/examples/runkit.js
-const token = "uc83kc9uo4u90x2psnm7jyxvlv833i";
-const username = "ItsDece";
-// twitch api token: 
+// const TwitchJs = require('twitch-js').default; // CONSIDER REPLACING TMI WITH THIS. example: https://github.com/twitch-devs/twitch-js/blob/next/examples/runkit.js
+// const token = "uc83kc9uo4u90x2psnm7jyxvlv833i";
+// const username = "ItsDece";
+// // twitch api token: 
 
-// Instantiate clients.
-const { api, chat, chatConstants } = new TwitchJs({ token, username });
+// // Instantiate clients.
+// const { api, chat, chatConstants } = new TwitchJs({ token, username });
 
-// Get featured streams.
-api.get('streams/featured').then(response => {
-  console.log(response);
-  // Do stuff ...
-});
+// // Get featured streams.
+// api.get('streams/featured').then(response => {
+//   console.log(response);
+//   // Do stuff ...
+// });
 
 
 var options = {
@@ -48,10 +48,14 @@ var soundEffects = {
 };
 
 var sayTimeout = 60000;
-var sayTimeoutList = {};
+var sayTimeoutRecord = {};
+var sayLengthPermissions = {
+    "itsdece": 0,
+}
+var unlimitedSayCommandsList = ["itsdece"];
 
 client.on("chat", function(channel, userstate, message, self) {
-    console.log(userstate);
+    // console.log(userstate);
     // TwitchClient.getUser(userstate["user-id"]);
     if(message.includes("!discord")) {
         sayInChat("Join the discord here: https://discord.gg/65jUQ8G")
@@ -83,16 +87,16 @@ function speakText(username, message) {
     if (!message.length) {
         return
     }
-    if (sayTimeoutList[username]) {
-        var lastTime = sayTimeoutList[username];
+    if (sayTimeoutRecord[username]) {
+        var lastTime = sayTimeoutRecord[username];
         var elapsedTime = Date.now() - lastTime;
-        if (elapsedTime < sayTimeout) {
+        if (elapsedTime < sayTimeout && !unlimitedSayCommandsList.includes(username)) {
             sayInChat(`Yo ${username}, chill out with the !say command for at least another ${Math.ceil((sayTimeout - elapsedTime)/1000)} seconds`);
             return;
         }
     }
-    sayTimeoutList[username] = Date.now();
-    say.speak(message, "Microsoft Zira Desktop", 1.0, function(err){
+    sayTimeoutRecord[username] = Date.now();
+    say.speak(message, "Alex", 1.0, function(err){ // "Microsoft Zira Desktop"
         if (err) {
             console.log(`FAILED attempt to speak: ${message}`)
         } else {
@@ -100,11 +104,15 @@ function speakText(username, message) {
         }
     });
 
-    setTimeout(() => {
-      say.stop((err) => {
-        if (!err) {
-          sayInChat(`@${username} your message was too long so I had to cut off.`)
-        }        
-      });
-    }, 5000)
+    var timeout = sayLengthPermissions.hasOwnProperty(username) ? sayLengthPermissions[username] : 10000;
+
+    if (timeout > 0) {
+        setTimeout(function() {
+          say.stop((err) => {
+            if (!err) {
+              sayInChat(`@${username} your message was too long so I had to cut off.`)
+            }        
+          });
+        }, timeout)
+    }
 }
