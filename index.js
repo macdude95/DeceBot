@@ -96,7 +96,7 @@ function speakText(username, message) {
         }
     }
     sayTimeoutRecord[username] = Date.now();
-    say.speak(message, "Alex", 1.0, function(err){ // "Microsoft Zira Desktop"
+    say.speak(message, "Microsoft Zira Desktop", 1.0, function(err){ // "Microsoft Zira Desktop"
         if (err) {
             console.log(`FAILED attempt to speak: ${message}`)
         } else {
