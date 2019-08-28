@@ -51,6 +51,7 @@ var sayTimeout = 60000;
 var sayTimeoutRecord = {};
 var sayLengthPermissions = {
     "itsdece": 0,
+    "br4c3_dk": 0,
 }
 var unlimitedSayCommandsList = ["itsdece"];
 
@@ -116,3 +117,4 @@ function speakText(username, message) {
         }, timeout)
     }
 }
+
