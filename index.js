@@ -2,6 +2,7 @@ var tmi = require('tmi.js');
 var say = require('say');
 var fs = require("fs");
 const SoundEffect = require('./SoundEffect.js');
+const OBSController = require('./OBSController.js');
 
 var twitchPermissionsTokens = JSON.parse(fs.readFileSync("twitchPermissionsTokens.json"));
 const botName = "DeceBot";
@@ -18,14 +19,6 @@ var tmiOptions = {
     },
     channels: ["itsdece"]
 }
-
-var client = new tmi.client(tmiOptions);
-client.connect();
-
-
-client.on("connected", function(a,p) {
-    sayInChat("SUP WORLD!");
-});
 
 var soundEffects = {
     "!Tuturu": new SoundEffect("!Tuturu", "Tuturu.mp3"),
@@ -50,15 +43,26 @@ var sayLengthPermissions = {
 }
 var unlimitedSayCommandsList = ["itsdece"];
 
+var client = new tmi.client(tmiOptions);
+client.connect();
+
+
+client.on("connected", function(a,p) {
+    sayInChat("SUP WORLD!");
+});
+
+const obsController = new OBSController();
+
+
 client.on("chat", function(channel, userstate, message, self) {
-    // console.log(userstate);
-    // TwitchClient.getUser(userstate["user-id"]);
     if(message.includes("!discord")) {
         sayInChat("Join the discord here: https://discord.gg/65jUQ8G")
     } else if(message.includes("!say") && userstate.username != "decebot") {
         speakText(userstate.username, message.replace("!say", ""));
     } else if (soundEffectCommandInMessage(message)) {
         soundEffectCommandInMessage(message).playSound(userstate.username);
+    } else if (message == "decess2Smush") {
+        // obsController.toggleWebcamZoom();
     } else {
         //console.log("Nothing to do here...");
     }
