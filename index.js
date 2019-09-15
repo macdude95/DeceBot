@@ -1,37 +1,25 @@
 var tmi = require('tmi.js');
 var say = require('say');
-const SoundEffect = require('./SoundEffect.js')
-// const TwitchJs = require('twitch-js').default; // CONSIDER REPLACING TMI WITH THIS. example: https://github.com/twitch-devs/twitch-js/blob/next/examples/runkit.js
-// const token = "uc83kc9uo4u90x2psnm7jyxvlv833i";
-// const username = "ItsDece";
-// // twitch api token: 
+var fs = require("fs");
+const SoundEffect = require('./SoundEffect.js');
 
-// // Instantiate clients.
-// const { api, chat, chatConstants } = new TwitchJs({ token, username });
-
-// // Get featured streams.
-// api.get('streams/featured').then(response => {
-//   console.log(response);
-//   // Do stuff ...
-// });
-
-
-var options = {
+var twitchPermissionsTokens = JSON.parse(fs.readFileSync("twitchPermissionsTokens.json"));
+const botName = "DeceBot";
+var tmiOptions = {
     options: {
         debug: false
     },
     connection: {
-        cluster: "aws",
         reconnect: true
     },
     identity: {
-        username: "DeceBot",
-        password: "oauth:7fgcs39add7sai7jibewmxzr6b7ydq"
+        username: botName,
+        password: twitchPermissionsTokens[botName]
     },
     channels: ["itsdece"]
 }
 
-var client = new tmi.client(options);
+var client = new tmi.client(tmiOptions);
 client.connect();
 
 
@@ -41,10 +29,17 @@ client.on("connected", function(a,p) {
 
 var soundEffects = {
     "!Tuturu": new SoundEffect("!Tuturu", "Tuturu.mp3"),
+    "decess2Hai": new SoundEffect("decess2Hai", "Tuturu.mp3"),
     "!Oof": new SoundEffect("!Oof", "Roblox Death Sound Effect.mp3"),
     "!MonkaGigaDude": new SoundEffect("!MonkaGigaDude", "monka giga dude.mp3", ["itsdece", "br4c3_dk"]),
-    "!MissedIt": new SoundEffect("!MissedIt", "missed it by that much.mp3"),
-    "!Dust": new SoundEffect("!Dust", "another one bites the dust.mp3")
+    "!SoClose": new SoundEffect("!SoClose", "missed it by that much.mp3"),
+    "!Dust": new SoundEffect("!Dust", "another one bites the dust.mp3"),
+    "!Run": new SoundEffect("!Run", "Run Sound Effect.mp3", ["itsdece", "duderonitti"]),
+    "!Yeah": new SoundEffect("!Yeah", "Yeah.mp3"),
+    "!Awhee": new SoundEffect("!Awhee", "Awhee.mp3", ["itsdece", "kangat"]),
+    "!Peg": new SoundEffect("!Peg", "AndPeggy.mp3", ["itsdece", "br4c3_dk"]),
+    "!Nice": new SoundEffect("!Nice", "verynice.mp3"),
+    "!DonutAsk": new SoundEffect("!DonutAsk", "donut.mp3", ["itsdece", "BlakeSomething"]),
 };
 
 var sayTimeout = 60000;
