@@ -8,7 +8,7 @@ const webcamName = "Webcam";
 class OBSController {
     constructor(command) {
         this.command = command;
-        obs.connect().then(() => {
+        obs.connect({ address: 'localhost:4445'}).then(() => {
             console.log(`OBS Controller: Success! We're connected & authenticated.`);
         });
 

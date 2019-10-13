@@ -10,14 +10,14 @@ var unlimitedSayCommandsList = ["itsdece"];
 
 class SayCommand extends Command {
     constructor(command, sayInChat, userPermissionsList=[]) {
-        super(command, userPermissionsList);
+        super(command, null, userPermissionsList);
         this.sayInChat = sayInChat;
     }
 
     execute(username, message) {
         var say_text = message.toLowerCase().replace("!say", "")
         if (!say_text.length || username == "decebot") {
-            return
+            return;
         }
         if (sayTimeoutRecord[username]) {
             var lastTime = sayTimeoutRecord[username];

@@ -13,6 +13,9 @@ class Command {
     }
 
     execute(username, message) {
+        if (!this.isAllowedFor(username)) {
+            return;
+        }
         this.closure();
     }
 }
