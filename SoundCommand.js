@@ -1,20 +1,13 @@
+const Command = require('./Command.js');
 var player = require('play-sound')(opts = {});
 
-class SoundEffect {
+class SoundCommand extends Command {
     constructor(command, filePath, userPermissionsList=[]) {
-        this.command = command;
+        super(command, userPermissionsList);
         this.filePath = filePath;
-        this.userPermissionsList = userPermissionsList;
     }
 
-    isAllowedFor(username) {
-        if (!this.userPermissionsList.length) {
-            return true;
-        } 
-        return this.userPermissionsList.includes(username);
-    }
-
-    playSound(username) {
+    execute(username, message) {
         var filePath = this.filePath;
         if (!this.isAllowedFor(username)) {
             return;
@@ -24,11 +17,11 @@ class SoundEffect {
 
         player.play(pathToSoundEffects + filePath, function(err){
             if (err) {
-                console.log(`FAILED attempt to play: ${filePath}`)
+                console.log(`FAILED - ${username} attempted to play: ${filePath}`)
             } else {
-                console.log(`SUCCESS played audio: ${filePath}`)
+                console.log(`SUCCESS - ${username} played audio: ${filePath}`)
             }
         });
     }
 }
-module.exports = SoundEffect
+module.exports = SoundCommand

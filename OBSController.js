@@ -14,6 +14,78 @@ class OBSController {
 
     }
 
+    isSourceVisible(sourceName) {
+        obs.send('GetSceneItemProperties', {
+            'item': pantsName
+        }).then(data => {
+            return data.visible;
+        }).catch(err => {
+            console.log(err);
+        });
+    }
+
+    setCurrentScene(sceneName) {
+        obs.send('SetCurrentScene', {
+            'scene-name': sceneName
+        })
+        .catch(err => {
+            console.log(err);
+        });
+    }
+
+    playVideo(name, seconds) {
+        obs.send('SetSceneItemProperties', {
+            'item': name,
+            'visible': false
+        })
+        .then(data => {
+            // Delay for 0.1 seconds otherwise OBS doesn't detect the source as being made visible
+            setTimeout(function() {
+                obs.send('SetSceneItemProperties', {
+                    'item': name,
+                    'visible': true
+                })
+                .then(data => {
+                    setTimeout(function() {
+                        obs.send('SetSceneItemProperties', {
+                            'item': name,
+                            'visible': false
+                        })
+                    }, seconds*1000);
+                });
+            }, 100);
+        })
+        .catch(err => {
+            console.log(err);
+        });
+    }
+
+    // TODO
+    toggleWebcamZoom() {
+        obs.send('GetSceneItemProperties', {
+            'item': webcamName
+        })
+        .then(data => {
+            console.log(data);
+
+        })
+        .catch(err => {
+            console.log(err);
+        });
+    }
+
+
+    // TODO: Make a generic cycle through that can be used for pants and camera/pic, etc. Maybe even allow passing in closures to be associated with each change (i.e. spongebob laugh)
+    cycleThroughPants() {
+        var pants = ["spongebobPants", "marioPants"];
+        var pantsVisibleDict = {};
+        for (const pantsName of pants) {
+            pantsVisibleDict[pantsName] = isSourceVisible(pantsName);
+        }
+        
+    }
+
+    // Not Using Anymore
     swapCameraAndPic() {
         var picName = "MikeBike";
         var webcamIsVisible = false;
@@ -50,29 +122,7 @@ class OBSController {
         .catch(err => {
             console.log(err);
         });
-        
     }
 
-    toggleWebcamZoom() {
-        obs.send('GetSceneItemProperties', {
-            'item': webcamName
-        })
-        .then(data => {
-            console.log(data);
-
-        })
-        .catch(err => {
-            console.log(err);
-        });
-    }
-
-    setCurrentScene(sceneName) {
-        obs.send('SetCurrentScene', {
-            'scene-name': sceneName
-        })
-        .catch(err => {
-            console.log(err);
-        });
-    }
 }
 module.exports = OBSController

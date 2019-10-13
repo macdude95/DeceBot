@@ -1,8 +1,9 @@
 var tmi = require('tmi.js');
-var say = require('say');
 var fs = require("fs");
-const SoundEffect = require('./SoundEffect.js');
 const OBSController = require('./OBSController.js');
+const Command = require('./Command.js');
+const SoundCommand = require('./SoundCommand.js');
+const SayCommand = require('./SayCommand.js');
 
 var twitchPermissionsTokens = JSON.parse(fs.readFileSync("twitchPermissionsTokens.json"));
 const botName = "DeceBot";
@@ -20,28 +21,37 @@ var tmiOptions = {
     channels: ["itsdece"]
 }
 
-var soundEffects = {
-    "!Tuturu": new SoundEffect("!Tuturu", "Tuturu.mp3"),
-    "decess2Hai": new SoundEffect("decess2Hai", "Tuturu.mp3"),
-    "!Oof": new SoundEffect("!Oof", "Roblox Death Sound Effect.mp3"),
-    "!MonkaGigaDude": new SoundEffect("!MonkaGigaDude", "monka giga dude.mp3", ["itsdece", "br4c3_dk"]),
-    "!SoClose": new SoundEffect("!SoClose", "missed it by that much.mp3"),
-    "!Dust": new SoundEffect("!Dust", "another one bites the dust.mp3"),
-    "!Run": new SoundEffect("!Run", "Run Sound Effect.mp3", ["itsdece", "duderonitti"]),
-    "!Yeah": new SoundEffect("!Yeah", "Yeah.mp3"),
-    "!Awhee": new SoundEffect("!Awhee", "Awhee.mp3", ["itsdece", "kangat"]),
-    "!Peg": new SoundEffect("!Peg", "AndPeggy.mp3", ["itsdece", "br4c3_dk"]),
-    "!Nice": new SoundEffect("!Nice", "verynice.mp3"),
-    "!DonutAsk": new SoundEffect("!DonutAsk", "donut.mp3", ["itsdece", "BlakeSomething"]),
-};
+var commands = [
+    // Text to speech command:
+    new SayCommand("!Say", message => { sayInChat(message) }),
 
-var sayTimeout = 60000;
-var sayTimeoutRecord = {};
-var sayLengthPermissions = {
-    "itsdece": 0,
-    "br4c3_dk": 0,
-}
-var unlimitedSayCommandsList = ["itsdece"];
+    // General Sound Effect Commands:
+    new SoundCommand("!Tuturu", "Tuturu.mp3"),
+    new SoundCommand("decess2Hai", "Tuturu.mp3"),
+    new SoundCommand("!Oof", "Roblox Death Sound Effect.mp3"),
+    new SoundCommand("!MonkaGigaDude", "monka giga dude.mp3", ["itsdece", "br4c3_dk"]),
+    new SoundCommand("!SoClose", "missed it by that much.mp3"),
+    new SoundCommand("!Dust", "another one bites the dust.mp3"),
+    new SoundCommand("!Yeah", "Yeah.mp3"),
+    new SoundCommand("!Nice", "verynice.mp3"),
+
+    // DeceBot text commands:
+    new Command("!Discord", () => { sayInChat("Join the discord here: https://discord.gg/65jUQ8G"); }),
+    
+    // Meme Video Commands:
+    new Command("!Fortnite", () => { obsController.playVideo("FortniteDance", 9); }),
+    new Command("!DontWatch", () => { obsController.playVideo("DontLetYourKidsWatchIt", 7); }),
+    new Command("!Wow", () => { obsController.playVideo("Wow", 6); }),
+    new Command("!Error", () => { obsController.playVideo("WindowsError", 6); }),
+    new Command("!AnotherOne", () => { obsController.playVideo("AnotherOne", 12); }),
+
+    // Subs Sound Effect Commands:
+    new SoundCommand("!Run", "Run Sound Effect.mp3", ["itsdece", "duderonitti"]),
+    new SoundCommand("!Awhee", "Awhee.mp3", ["itsdece", "kangat"]),
+    new SoundCommand("!Mulligan", "Hercules_Mulligan.mp3", ["itsdece", "br4c3_dk"]),
+    new SoundCommand("!DonutAsk", "donut.mp3", ["itsdece", "blakesomething"]),
+    new SoundCommand("!Sammich", "sammich.mp3", ["itsdece", "sensei1667"]),
+];
 
 var client = new tmi.client(tmiOptions);
 client.connect();
@@ -55,23 +65,15 @@ const obsController = new OBSController();
 
 
 client.on("chat", function(channel, userstate, message, self) {
-    if(message.includes("!discord")) {
-        sayInChat("Join the discord here: https://discord.gg/65jUQ8G")
-    } else if(message.includes("!say") && userstate.username != "decebot") {
-        speakText(userstate.username, message.replace("!say", ""));
-    } else if (soundEffectCommandInMessage(message)) {
-        soundEffectCommandInMessage(message).playSound(userstate.username);
-    } else if (message == "decess2Smush") {
-        // obsController.toggleWebcamZoom();
-    } else {
-        //console.log("Nothing to do here...");
+    if (findCommandInMessage(message)) {
+        findCommandInMessage(message).execute(userstate.username, message);
     }
 });
 
-function soundEffectCommandInMessage(message) {
-    for (const key of Object.keys(soundEffects)) {
-        if (message.toLowerCase().includes(key.toLowerCase())) {
-            return soundEffects[key];
+function findCommandInMessage(message) {
+    for (const command of commands) {
+        if (message.toLowerCase().includes(command.command.toLowerCase())) {
+            return command;
         }
     }
     return null;
@@ -80,40 +82,5 @@ function soundEffectCommandInMessage(message) {
 function sayInChat(message) {
     client.say("itsdece", message);
     // client.action("itsdece", message);
-}
-
-function speakText(username, message) {
-    // Idea: https://github.com/axa-group/nlp.js/blob/HEAD/docs/binary-relevance-nlu.md
-    if (!message.length) {
-        return
-    }
-    if (sayTimeoutRecord[username]) {
-        var lastTime = sayTimeoutRecord[username];
-        var elapsedTime = Date.now() - lastTime;
-        if (elapsedTime < sayTimeout && !unlimitedSayCommandsList.includes(username)) {
-            sayInChat(`Yo ${username}, chill out with the !say command for at least another ${Math.ceil((sayTimeout - elapsedTime)/1000)} seconds`);
-            return;
-        }
-    }
-    sayTimeoutRecord[username] = Date.now();
-    say.speak(message, "Microsoft Zira Desktop", 1.0, function(err){ // "Microsoft Zira Desktop"
-        if (err) {
-            console.log(`FAILED attempt to speak: ${message}`)
-        } else {
-            console.log(`SUCCESS text to speech: ${message}`)
-        }
-    });
-
-    var timeout = sayLengthPermissions.hasOwnProperty(username) ? sayLengthPermissions[username] : 10000;
-
-    if (timeout > 0) {
-        setTimeout(function() {
-          say.stop((err) => {
-            if (!err) {
-              sayInChat(`@${username} your message was too long so I had to cut off.`)
-            }        
-          });
-        }, timeout)
-    }
 }
 
