@@ -6,7 +6,9 @@ var sayTimeoutRecord = {};
 var sayLengthPermissions = {
     "itsdece": 0,
 }
-var unlimitedSayCommandsList = ["itsdece"];
+var unlimitedSayCommandsList = [
+    "itsdece"
+];
 
 class SayCommand extends Command {
     constructor(command, sayInChat, userPermissionsList=[]) {
@@ -15,6 +17,7 @@ class SayCommand extends Command {
     }
 
     execute(username, message) {
+        var sayInChat = this.sayInChat;
         var say_text = message.toLowerCase().replace("!say", "")
         if (!say_text.length || username == "decebot") {
             return;
@@ -23,7 +26,7 @@ class SayCommand extends Command {
             var lastTime = sayTimeoutRecord[username];
             var elapsedTime = Date.now() - lastTime;
             if (elapsedTime < sayTimeout && !unlimitedSayCommandsList.includes(username)) {
-                this.sayInChat(`Yo ${username}, chill out with the !say command for at least another ${Math.ceil((sayTimeout - elapsedTime)/1000)} seconds`);
+                sayInChat(`Yo ${username}, chill out with the !say command for at least another ${Math.ceil((sayTimeout - elapsedTime)/1000)} seconds`);
                 return;
             }
         }
@@ -42,7 +45,7 @@ class SayCommand extends Command {
             setTimeout(function() {
               say.stop((err) => {
                 if (!err) {
-                  this.sayInChat(`@${username} your message was too long so I had to cut off.`)
+                  sayInChat(`@${username} your message was too long so I had to cut off.`)
                 }        
               });
             }, timeout)
