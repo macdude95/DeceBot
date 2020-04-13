@@ -1,5 +1,6 @@
 var tmi = require('tmi.js');
 var fs = require("fs");
+const path = require('path');
 const OBSController = require('./OBSController.js');
 const Command = require('./Command.js');
 const SoundCommand = require('./SoundCommand.js');
@@ -10,6 +11,12 @@ if (process.argv.includes("--help")) {
     console.log("Usage: node index.js [--slippi]");
     return;
 }
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (reason, p) => {
+  // console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
+  // application specific logging, throwing an error, or other logic here
+});
 
 var twitchPermissionsTokens = JSON.parse(fs.readFileSync("twitchPermissionsTokens.json"));
 const botName = "DeceBot";
@@ -31,46 +38,45 @@ var commands = [
     // Text to speech command:
     new SayCommand("!Say", message => { sayInChat(message) }),
 
-    // General Sound Effect Commands:
-    new SoundCommand("!Tuturu", "Tuturu.mp3", sayInChat),
-    new SoundCommand("!Ayaya", "ayaya.mp3", sayInChat),
-    new SoundCommand("decess2Hai", "Tuturu.mp3", sayInChat),
-    new SoundCommand("!Oof", "Roblox Death Sound Effect.mp3", sayInChat),
-    new SoundCommand("!MonkaGigaDude", "monka giga dude.mp3", sayInChat, ["itsdece", "br4c3_dk"]),
-    new SoundCommand("!SoClose", "missed it by that much.mp3", sayInChat),
-    new SoundCommand("!Dust", "another one bites the dust.mp3", sayInChat),
-    new SoundCommand("!Yeah", "Yeah.mp3", sayInChat),
-    new SoundCommand("!Nice", "verynice.mp3", sayInChat),
-    new SoundCommand("!Better", "InvaderZimVideoGameLogic.mp3", sayInChat),
-
     // DeceBot text commands:
     new Command("!Discord", () => { sayInChat("Join the discord here: https://discord.gg/65jUQ8G"); }),
     new Command("!Github", () => { sayInChat("Wanna see what my insides look like? https://github.com/micantre/DeceBot"); }),
-    
-    // Meme Video Commands:
-    // new Command("!Fortnite", () => { obsController.playVideo("FortniteDance", 9); }),
-    // new Command("!DontWatch", () => { obsController.playVideo("DontLetYourKidsWatchIt", 7); }, ["itsdece"]),
-    // new Command("!Wow", () => { obsController.playVideo("Wow", 6); }),
-    // new Command("!Error", () => { obsController.playVideo("WindowsError", 6); }, ["itsdece"]),
-    // new Command("!AnotherOne", () => { obsController.playVideo("AnotherOne", 5); }),
-    // new Command("!DoIt", () => { obsController.playVideo("DoIt", 8); }),
-    // new Command("!Noice", () => { obsController.playVideo("Noice", 5); }),
-    // new Command("!Hey", () => { obsController.playVideo("VsauceMichael", 4); }),
-    // new Command("!Stupid", () => { obsController.playVideo("StupidTown", 7); }),
-    // new Command("!YUMad", () => { obsController.playVideo("WhyHeff2BeMad", 7); }),
-    // new Command("!Quality", () => { obsController.playVideo("ManOfQuality", 7); }),
-    // new Command("!LetMeFinish", () => { obsController.playVideo("LetMeFinishStory", 7); }),
+    new Command("!CupheadWars", () => { sayInChat("The great Cuphead Wars of 2020 is a competition between me and a couple of my coworkers to see who can beat cuphead the fastest. Others in the competition are https://www.twitch.tv/kishkishftw and https://www.twitch.tv/faultymuse"); }),
+    new Command("!NewSoundboard", () => { sayInChat("The subscriber sound effect commands are now shared in one collective subscriber soundboard."); }),
 
-    // Subs Sound Effect Commands:
-    new SoundCommand("!Run", "Run Sound Effect.mp3", sayInChat, ["itsdece", "duderonitti"]),
-    new SoundCommand("!Awhee", "Awhee.mp3", sayInChat, ["itsdece", "kangat"]),
-    new SoundCommand("!Mulligan", "Hercules_Mulligan.mp3", sayInChat, ["itsdece", "br4c3_dk"]),
-    new SoundCommand("!DonutAsk", "donut.mp3", sayInChat, ["itsdece", "blakesomething"]),
-    new SoundCommand("!Sammich", "sammich.mp3", sayInChat, ["itsdece", "sensei1667"]),
-    new SoundCommand("!GreatJob", "CJGreatJob.mp3", sayInChat, ["itsdece", "cjya2016"]),
-    new SoundCommand("!Hiyaa", "Hiyaa.mp3", sayInChat, ["itsdece", "theviscacha"]),
-    new SoundCommand("!Milkshake", "Milkshake.mp3", sayInChat, ["itsdece", "jwillsta"]),
+    // Sound commands are autimatically added in the code below
 ];
+
+// Automatically add Sound Commands code from: https://stackoverflow.com/questions/32511789/looping-through-files-in-a-folder-node-js
+(async ()=>{
+    const soundBoardPath = "C:\\Users\\Michael\\Desktop\\StreamStuff\\Media\\SoundEffects\\SoundBoard";
+    const folderPaths = [
+        soundBoardPath + "\\General",
+        soundBoardPath + "\\SubOnly"
+    ];
+    try {
+        for(const folderPath of folderPaths) {
+            const files = await fs.promises.readdir(folderPath);
+            const isSubOnly = folderPath.includes("SubOnly");
+            var commandsInFolder = [];
+            for(const file of files) {
+                if (file.includes(".txt")) {
+                    continue;
+                }
+                const fullPath = path.join( folderPath, file );
+                var command =`!${file.split(".")[0]}`;
+                commands.push(new SoundCommand(command, fullPath, sayInChat, isSubOnly));
+                commandsInFolder.push(command);
+            }
+            fs.writeFile(folderPath + "\\Commands.txt", commandsInFolder.join("\n"), (error) => {});
+        }
+    } catch(e) {
+        console.error( "Exception thrown while generating sound commands:", e );
+    } finally {
+        console.log( "Loaded all sound commands in %s", soundBoardPath);
+    }
+
+})();
 
 var client = new tmi.client(tmiOptions);
 client.connect();
@@ -88,7 +94,7 @@ if (process.argv.includes("--slippi")) {
 
 client.on("chat", function(channel, userstate, message, self) {
     if (findCommandInMessage(message)) {
-        findCommandInMessage(message).execute(userstate.username, message);
+        findCommandInMessage(message).execute(userstate, message);
     }
 });
 

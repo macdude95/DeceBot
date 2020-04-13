@@ -12,13 +12,14 @@ var unlimitedSayCommandsList = [
 
 class SayCommand extends Command {
     constructor(command, sayInChat, userPermissionsList=[]) {
-        super(command, null, userPermissionsList);
-        this.sayInChat = sayInChat;
+        super(command, sayInChat, userPermissionsList);
+        this.sayInChat = this.closure;
     }
 
-    execute(username, message) {
+    execute(userstate, message) {
+        const username = userstate.username;
         var sayInChat = this.sayInChat;
-        var say_text = message.toLowerCase().replace("!say", "")
+        var say_text = message.toLowerCase().replace("!say", "").replace("decebot", "dece bot").replace("dece", "deese");
         if (!say_text.length || username == "decebot") {
             return;
         }
