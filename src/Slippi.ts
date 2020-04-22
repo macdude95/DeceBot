@@ -1,11 +1,33 @@
 // SPECs - https://github.com/project-slippi/slippi-wiki/blob/master/SPEC.md
 
-const { default: SlippiGame } = require('slp-parser-js');
-const chokidar = require('chokidar');
-const _ = require('lodash');
+// const { default: SlippiGame } = require('slp-parser-js');
+import SlippiGame, { GameEndType, FrameEntryType } from 'slp-parser-js';
+import chokidar from 'chokidar';
+import _ from 'lodash';
+import OBSController from './OBSController';
 
-class Slippi {
-    constructor(listenPath, obs=null) {
+interface GameState {
+    settings: any;
+    detectedPunishes: any
+}
+
+interface GameData {
+    game: SlippiGame,
+    state: GameState
+}
+
+interface GameDataByPath {
+    [path: string]: GameData
+}
+
+export default class Slippi {
+    obs: OBSController | null;
+    gameIsPlaying: boolean;
+    playerLastHitBy: (number|null)[];
+    playerPreviousActionState: (number|null)[];
+    watcher: chokidar.FSWatcher;
+
+    constructor(listenPath: string | readonly string[], obs:OBSController|null=null) {
         this.obs = obs;
         this.gameIsPlaying = false;
         this.playerLastHitBy = [-1,-1,-1,-1];
@@ -24,10 +46,10 @@ class Slippi {
     }
 
     run() {
-        var gameByPath = {}
+        const gameByPath: GameDataByPath = {}
         this.watcher.on('change', (path) => {
             const start = Date.now();
-            let gameState, settings, stats, frames, latestFrame, gameEnd;
+            let gameState, settings, stats, frames, latestFrame: FrameEntryType | null, gameEnd: GameEndType | null;
             try {
                 let game = _.get(gameByPath, [path, 'game']);
                 if (!game) {
@@ -93,11 +115,11 @@ class Slippi {
                     7: "No Contest",
                 };
 
-                const endMessage = _.get(endTypes, gameEnd.gameEndMethod) || "Unknown";
+                const endMessage = _.get(endTypes, gameEnd.gameEndMethod || '') || "Unknown";
 
                 const lrasText = gameEnd.gameEndMethod === 7 ? ` | Quitter Index: ${gameEnd.lrasInitiatorIndex}` : "";
                 console.log(`[Game Complete] Type: ${endMessage}${lrasText}`);
-                
+
                 this.setGameIsPlaying(false, gameEnd.gameEndMethod === 7);
                 this.setWinner(gameEnd, latestFrame);
             }
@@ -106,88 +128,87 @@ class Slippi {
         });
     }
 
-    setSettings(settings) {
+    setSettings(settings: { players: any; }) {
         for (const player of settings.players) {
-            var port = player.port;
-            var tag = player.nametag.length == 0 ? `P${port}` : player.nametag;
-            var sourceName = `NameTag${port}`;
-            this.obs.setText(sourceName, tag, 16777215);
+            const port = player.port;
+            const tag = player.nametag.length == 0 ? `P${port}` : player.nametag;
+            const sourceName = `NameTag${port}`;
+            this.obs && this.obs.setText(sourceName, tag, 16777215);
         }
     }
 
-    setWinner(gameEnd, latestFrame) {
+    setWinner(gameEnd: GameEndType, latestFrame: FrameEntryType|null) {
         if (gameEnd.lrasInitiatorIndex == -1) {
             // console.log(latestFrame);
             // // frameData.post.stocksRemaining
             // for (const frame of latestFrame.players) {
             //     const frameData = player.pre
             // }
-            // var found = array.find(function(element) { 
-            //   return element > 4; 
-            // }); 
-            var winnerPlayerIndex = latestFrame.players.findIndex(function(frameData) {
+            // const found = array.find(function(element) {
+            //   return element > 4;
+            // });
+            const winnerPlayerIndex = (latestFrame as any).players.findIndex(function(frameData: { post: { stocksRemaining: number; }; }) {
                return frameData.post.stocksRemaining > 0;
             })
-            var sourceName =`NameTag${winnerPlayerIndex + 1}`;
-            this.obs.setText(sourceName, null, 65535);
+            const sourceName =`NameTag${winnerPlayerIndex + 1}`;
+            this.obs && this.obs.setText(sourceName, null, 65535);
         }
     }
 
-    checkForDunk(frameData, playerIndex, otherPlayerFrameData) {
-        var playerDied = this.didPlayerJustDie(frameData, playerIndex, "bottom");
+    checkForDunk(frameData: any, playerIndex: string | number, otherPlayerFrameData: any) {
+        const playerDied = this.didPlayerJustDie(frameData, playerIndex, "bottom");
         if(playerDied) {
-            console.log(`Player ${playerIndex}'s action state when they died: ` + this.playerPreviousActionState[playerIndex]);
+            console.log(`Player ${playerIndex}'s action state when they died: ` + this.playerPreviousActionState[playerIndex as number]);
         }
-        if (playerDied && this.playerPreviousActionState[playerIndex] == 88) {
-            this.playerDunkEvent(playerIndex, this.playerIsPressingButton("A", otherPlayerFrameData));
-        }
-    }
-
-    checkForSD(frameData, playerIndex) {
-        var playerDied = this.didPlayerJustDie(frameData, playerIndex, "bottom");
-        if (playerDied && this.playerLastHitBy[playerIndex] == 6) {
-            this.playerSDEvent(playerIndex, this.playerIsPressingButton("A", frameData));
+        if (playerDied && this.playerPreviousActionState[playerIndex as number] == 88) {
+            this.playerDunkEvent(playerIndex.toString(), this.playerIsPressingButton("A", otherPlayerFrameData));
         }
     }
 
-    didPlayerJustDie(frameData, playerIndex, side) {
+    checkForSD(frameData: any, playerIndex: string | number) {
+        const playerDied = this.didPlayerJustDie(frameData, playerIndex, "bottom");
+        if (playerDied && this.playerLastHitBy[playerIndex as number] == 6) {
+            this.playerSDEvent(playerIndex.toString(), this.playerIsPressingButton("A", frameData));
+        }
+    }
+
+    didPlayerJustDie(frameData: { post: { actionStateId: number; }; }, playerIndex: string | number, side: string) {
         // TODO: logic for other sides
         if (side == "bottom") {
-            return frameData.post.actionStateId == 0 && this.playerPreviousActionState[playerIndex] != 0;
+            return frameData.post.actionStateId == 0 && this.playerPreviousActionState[playerIndex as number] != 0;
         }
         return false;
     }
 
-    setGameIsPlaying(newValue, noContest=false) {
-        var obs = this.obs;
+    setGameIsPlaying(newValue: boolean, noContest=false) {
         if (this.gameIsPlaying == newValue) {
             return;
         }
         this.gameIsPlaying = newValue;
 
-        var delaySeconds = (newValue || noContest) ? 0 : 2;
-        setTimeout(function() {
-            var sceneName = newValue ? "Melee" : "Just Me Scene";
-            obs.setCurrentScene(sceneName);
+        const delaySeconds = (newValue || noContest) ? 0 : 2;
+        setTimeout(() => {
+            const sceneName = newValue ? "Melee" : "Just Me Scene";
+            this.obs && this.obs.setCurrentScene(sceneName);
         }, delaySeconds*1000);
-        
+
     }
 
-    playerSDEvent(playerIndex, triggerEvent) {
+    playerSDEvent(playerIndex: string, triggerEvent: boolean) {
         console.log("Player " + playerIndex + " SDed");
         if (triggerEvent) {
-            this.obs.playVideo("ArmsOfAngels", 5);
+            this.obs && this.obs.playVideo("ArmsOfAngels", 5);
         }
     }
 
-    playerDunkEvent(playerIndex, triggerEvent) {
+    playerDunkEvent(playerIndex: string, triggerEvent: boolean) {
         console.log("Player " + playerIndex + " got DUNKED!");
         if (triggerEvent) {
-            this.obs.playVideo("SlamJam", 5);
+            this.obs && this.obs.playVideo("SlamJam", 5);
         }
     }
 
-    playerIsPressingButton(button, frameData) {
+    playerIsPressingButton(button: string, frameData: { pre: { buttons: number; }; }) {
         // xxxS YXBA xLRZ UDRL
         if (button == "A" || button == "a") {
             return (parseInt("0000000100000000",2) & frameData.pre.buttons) > 0;
@@ -197,4 +218,3 @@ class Slippi {
     }
 
 }
-module.exports = Slippi

@@ -1,16 +1,25 @@
-const Command = require('./Command.js');
-var player = require('play-sound')(opts = {});
+import { Userstate } from "tmi.js";
+import { SayInChatFunc } from "./utils";
 
-class SoundCommand extends Command {
-    constructor(command, filePath, sayInChat, isSubOnly) {
+import Command from './Command.js';
+import Player from 'play-sound';
+
+
+const player = Player({});
+
+export default class SoundCommand extends Command {
+    sayInChat: SayInChatFunc
+    filePath: string
+
+    constructor(command: string, filePath: string, sayInChat: SayInChatFunc, isSubOnly: boolean) {
         super(command, sayInChat, [], isSubOnly);
         this.filePath = filePath;
-        this.sayInChat = this.closure;
+        this.sayInChat = sayInChat;
     }
 
-    execute(userstate, message) {
+    execute(userstate: Userstate, message: string) {
         const username = userstate.username;
-        var filePath = this.filePath;
+        const filePath = this.filePath;
         if (username == "decebot") {
             return;
         }
@@ -19,7 +28,7 @@ class SoundCommand extends Command {
             return;
         }
 
-        player.play(filePath, function(err){
+        player.play(filePath, function(err: any){
             if (err) {
                 console.log(`FAILED - ${username} attempted to play: ${filePath}`)
             } else {
@@ -28,4 +37,3 @@ class SoundCommand extends Command {
         });
     }
 }
-module.exports = SoundCommand
