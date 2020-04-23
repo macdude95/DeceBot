@@ -1,5 +1,5 @@
 import { Userstate } from "tmi.js";
-import { SayInChatFunc } from "./utils";
+import { SayInChatFunc } from "../utils";
 
 import Command from './Command.js';
 import Player from 'play-sound';

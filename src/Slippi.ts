@@ -1,7 +1,7 @@
 // SPECs - https://github.com/project-slippi/slippi-wiki/blob/master/SPEC.md
 
 // const { default: SlippiGame } = require('slp-parser-js');
-import SlippiGame, { GameEndType, FrameEntryType } from 'slp-parser-js';
+import SlippiGame, { GameEndType, FrameEntryType, PreFrameUpdateType, PostFrameUpdateType, GameStartType } from 'slp-parser-js';
 import chokidar from 'chokidar';
 import _ from 'lodash';
 import OBSController from './OBSController';
@@ -18,6 +18,11 @@ interface GameData {
 
 interface GameDataByPath {
     [path: string]: GameData
+}
+
+interface PlayerFrameEntryType {
+    pre: PreFrameUpdateType;
+    post: PostFrameUpdateType;
 }
 
 export default class Slippi {
@@ -87,8 +92,8 @@ export default class Slippi {
             // console.log(`We have ${_.size(frames)} frames.`);
             this.setGameIsPlaying(true);
             _.forEach(settings.players, player => {
-                const frameData = _.get(latestFrame, ['players', player.playerIndex]);
-                const otherPlayerFrameData = _.get(latestFrame, ['players', (player.playerIndex + 1) % 2]);
+                const frameData = _.get(latestFrame, ['players', player.playerIndex]) as PlayerFrameEntryType;
+                const otherPlayerFrameData = _.get(latestFrame, ['players', (player.playerIndex + 1) % 2]) as PlayerFrameEntryType;
                 if (!frameData) {
                     return;
                 }
@@ -128,10 +133,10 @@ export default class Slippi {
         });
     }
 
-    setSettings(settings: { players: any; }) {
+    setSettings(settings: GameStartType) {
         for (const player of settings.players) {
             const port = player.port;
-            const tag = player.nametag.length == 0 ? `P${port}` : player.nametag;
+            const tag = (player.nametag as string).length == 0 ? `P${port}` : player.nametag;
             const sourceName = `NameTag${port}`;
             this.obs && this.obs.setText(sourceName, tag, 16777215);
         }
@@ -147,8 +152,8 @@ export default class Slippi {
             // const found = array.find(function(element) {
             //   return element > 4;
             // });
-            const winnerPlayerIndex = (latestFrame as any).players.findIndex(function(frameData: { post: { stocksRemaining: number; }; }) {
-               return frameData.post.stocksRemaining > 0;
+            const winnerPlayerIndex = (latestFrame as any).players.findIndex(function(frameData: PlayerFrameEntryType) {
+               return (frameData.post.stocksRemaining as number) > 0;
             })
             const sourceName =`NameTag${winnerPlayerIndex + 1}`;
             this.obs && this.obs.setText(sourceName, null, 65535);
@@ -165,14 +170,14 @@ export default class Slippi {
         }
     }
 
-    checkForSD(frameData: any, playerIndex: string | number) {
+    checkForSD(frameData: PlayerFrameEntryType, playerIndex: string | number) {
         const playerDied = this.didPlayerJustDie(frameData, playerIndex, "bottom");
         if (playerDied && this.playerLastHitBy[playerIndex as number] == 6) {
             this.playerSDEvent(playerIndex.toString(), this.playerIsPressingButton("A", frameData));
         }
     }
 
-    didPlayerJustDie(frameData: { post: { actionStateId: number; }; }, playerIndex: string | number, side: string) {
+    didPlayerJustDie(frameData: PlayerFrameEntryType, playerIndex: string | number, side: string) {
         // TODO: logic for other sides
         if (side == "bottom") {
             return frameData.post.actionStateId == 0 && this.playerPreviousActionState[playerIndex as number] != 0;
@@ -208,10 +213,10 @@ export default class Slippi {
         }
     }
 
-    playerIsPressingButton(button: string, frameData: { pre: { buttons: number; }; }) {
+    playerIsPressingButton(button: string, frameData: PlayerFrameEntryType) {
         // xxxS YXBA xLRZ UDRL
         if (button == "A" || button == "a") {
-            return (parseInt("0000000100000000",2) & frameData.pre.buttons) > 0;
+            return (0b100000000 & (frameData.pre.buttons as number)) > 0;
         }
         // TODO: logic for other buttons
         return false;

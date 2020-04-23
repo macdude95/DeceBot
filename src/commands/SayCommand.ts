@@ -1,7 +1,7 @@
 import Command from './Command.js';
 import say from 'say';
 import { Userstate } from 'tmi.js';
-import { SayInChatFunc } from './utils';
+import { SayInChatFunc } from '../utils';
 
 interface SayTimeouts {
     [username: string]: number
