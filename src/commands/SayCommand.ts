@@ -1,4 +1,4 @@
-import Command from './Command.js';
+import Command from './Command';
 import say from 'say';
 import { Userstate } from 'tmi.js';
 import { SayInChatFunc } from '../utils';

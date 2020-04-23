@@ -2,11 +2,7 @@ import OBSController from './OBSController';
 import Slippi from './Slippi';
 import { client } from './tmiClient';
 import { sayInChat, findCommandInMessage } from './utils';
-
-if (process.argv.includes('--help')) {
-  console.log('Usage: node index.js [--slippi]');
-  process.exit();
-}
+import { argv } from './commandLine';
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (reason, p) => {
@@ -15,7 +11,7 @@ process.on('unhandledRejection', (reason, p) => {
 });
 
 const obsController = new OBSController();
-if (process.argv.includes('--slippi')) {
+if (argv.slippi) {
   console.log('String slippi task...');
   const slippi = new Slippi('D:\\Games\\Dolphin\\Slippi\\Games', obsController);
 }
