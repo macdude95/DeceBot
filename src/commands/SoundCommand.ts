@@ -2,10 +2,8 @@ import { Userstate } from "tmi.js";
 import { SayInChatFunc } from "../utils";
 
 import Command from './Command';
-import Player from 'play-sound';
-
-
-const player = Player({});
+const soundPlayer = require('sound-play');
+// import soundPlayer from "sound-play";
 
 export default class SoundCommand extends Command {
     sayInChat: SayInChatFunc
@@ -28,12 +26,6 @@ export default class SoundCommand extends Command {
             return;
         }
 
-        player.play(filePath, function(err: any){
-            if (err) {
-                console.log(`FAILED - ${username} attempted to play: ${filePath}`)
-            } else {
-                console.log(`SUCCESS - ${username} played audio: ${filePath}`)
-            }
-        });
+        soundPlayer.play(filePath);
     }
 }

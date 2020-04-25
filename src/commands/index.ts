@@ -71,6 +71,9 @@ export const commands = [
     console.error('Exception thrown while generating sound commands:', e);
   } finally {
     console.log('Loaded all sound commands in %s', soundBoardPath);
+    // Write all commands to file
+    fs.writeFile("C:\\Users\\Michael\\Desktop\\StreamStuff\\Misc\\Commands.txt", commands.map(c => c.command).join(" - ") + " - ", (error) => {});
+
   }
 })();
 

@@ -57,11 +57,9 @@ export default class SayCommand extends Command {
 
         if (timeout > 0) {
             setTimeout(() => {
-                say.stop((err: any) => {
-                    if (!err) {
-                        sayInChat(`@${username} your message was too long so I had to cut off.`);
-                    }
-                });
+                say.stop();
+                sayInChat(`@${username} your message was too long so I had to cut off.`);
+
             }, timeout)
         }
     }
