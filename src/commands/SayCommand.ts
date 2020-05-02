@@ -20,7 +20,7 @@ const sayLengthPermissions: SayLengthPermissions = {
 export default class SayCommand extends Command {
     sayInChat: SayInChatFunc;
 
-    constructor(command: string, sayInChat: SayInChatFunc, userPermissionsList=[]) {
+    constructor(command: string, sayInChat: SayInChatFunc, userPermissionsList = []) {
         super(command, sayInChat, userPermissionsList);
 
         this.sayInChat = sayInChat;
@@ -37,14 +37,14 @@ export default class SayCommand extends Command {
             const lastTime = sayTimeoutRecord[username];
             const elapsedTime = Date.now() - lastTime;
             if (elapsedTime < sayTimeout && !userstate.mod) {
-                sayInChat(`Yo ${username}, chill out with the !say command for at least another ${Math.ceil((sayTimeout - elapsedTime)/1000)} seconds`);
+                sayInChat(`Yo ${username}, chill out with the !say command for at least another ${Math.ceil((sayTimeout - elapsedTime) / 1000)} seconds`);
                 return;
             } else {
 
             }
         }
         sayTimeoutRecord[username] = Date.now();
-        say.speak(say_text, "Microsoft Zira Desktop", 1.0, function(err){ // "Microsoft Zira Desktop"
+        say.speak(say_text, "Microsoft Zira Desktop", 1.0, function (err) { // "Microsoft Zira Desktop"
             if (err) {
                 console.log(`FAILED attempt to speak: ${say_text}`)
             } else {
@@ -57,9 +57,11 @@ export default class SayCommand extends Command {
 
         if (timeout > 0) {
             setTimeout(() => {
-                say.stop();
-                sayInChat(`@${username} your message was too long so I had to cut off.`);
-
+                say.stop((err) => {
+                    if (!err) {
+                        sayInChat(`@${username} your message was too long so I had to cut off.`);
+                    }
+                });
             }, timeout)
         }
     }
