@@ -2,8 +2,7 @@ import { Userstate } from "tmi.js";
 import { SayInChatFunc } from "../utils";
 
 import Command from './Command';
-const soundPlayer = require('sound-play');
-// import soundPlayer from "sound-play";
+import soundPlayer from 'sound-play';
 
 export default class SoundCommand extends Command {
     sayInChat: SayInChatFunc
