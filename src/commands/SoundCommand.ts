@@ -3,6 +3,7 @@ import { SayInChatFunc } from "../utils";
 
 import Command from './Command';
 import soundPlayer from 'sound-play';
+import * as config from '../../config.json';
 
 export default class SoundCommand extends Command {
     sayInChat: SayInChatFunc
@@ -17,7 +18,7 @@ export default class SoundCommand extends Command {
     execute(userstate: Userstate, message: string) {
         const username = userstate.username;
         const filePath = this.filePath;
-        if (username == "decebot") {
+        if (username == config.botName) {
             return;
         }
         if (!this.isAllowedFor(userstate)) {

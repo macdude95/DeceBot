@@ -4,8 +4,9 @@ import Command from './Command';
 import SayCommand from "./SayCommand";
 import SoundCommand from "./SoundCommand";
 import { sayInChat } from "../utils";
+import * as config from '../../config.json';
 
-export {Command, SayCommand, SoundCommand};
+export { Command, SayCommand, SoundCommand };
 
 export const commands = [
   // Text to speech command:
@@ -38,8 +39,7 @@ export const commands = [
 
 // Automatically add Sound Commands code from: https://stackoverflow.com/questions/32511789/looping-through-files-in-a-folder-node-js
 (async () => {
-  const soundBoardPath =
-    'C:\\Users\\Michael\\Desktop\\StreamStuff\\Media\\SoundEffects\\SoundBoard';
+  const soundBoardPath = config.soundBoardPath;
   const folderPaths = [
     path.join(soundBoardPath, 'General'),
     path.join(soundBoardPath, 'SubOnly'),
@@ -72,7 +72,8 @@ export const commands = [
   } finally {
     console.log('Loaded all sound commands in %s', soundBoardPath);
     // Write all commands to file
-    fs.writeFile("C:\\Users\\Michael\\Desktop\\StreamStuff\\Misc\\Commands.txt", commands.map(c => c.command).join(" - ") + " - ", (error) => {});
+    // TODO: denote sub only commands
+    fs.writeFile(config.commandsPath, commands.map(c => c.command).join(" - ") + " - ", (error) => { });
 
   }
 })();
