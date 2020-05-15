@@ -3,6 +3,10 @@ import say from 'say';
 import { Userstate } from 'tmi.js';
 import { SayInChatFunc } from '../utils';
 
+import * as config from '../../config.json';
+
+const channel = config.channel;
+
 interface SayTimeouts {
     [username: string]: number
 }
@@ -14,7 +18,7 @@ interface SayLengthPermissions {
 const sayTimeout = 60000;
 const sayTimeoutRecord: SayTimeouts = {};
 const sayLengthPermissions: SayLengthPermissions = {
-    "itsdece": 0,
+    channel: 0,
 }
 
 export default class SayCommand extends Command {
@@ -30,7 +34,7 @@ export default class SayCommand extends Command {
         const username = userstate.username;
         const sayInChat = this.sayInChat;
         const say_text = message.toLowerCase().replace("!say", "").replace("decebot", "dece bot").replace("dece", "deese");
-        if (!say_text.length || username == "decebot") {
+        if (!say_text.length || username == config.botName) {
             return;
         }
         if (sayTimeoutRecord[username]) {
@@ -44,7 +48,7 @@ export default class SayCommand extends Command {
             }
         }
         sayTimeoutRecord[username] = Date.now();
-        say.speak(say_text, "Microsoft Zira Desktop", 1.0, function (err) { // "Microsoft Zira Desktop"
+        say.speak(say_text, config.sayVoice, 1.0, function (err) { // "Microsoft Zira Desktop"
             if (err) {
                 console.log(`FAILED attempt to speak: ${say_text}`)
             } else {

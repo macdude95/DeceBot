@@ -1,10 +1,12 @@
 import { client } from "./tmiClient";
 import { commands } from "./commands";
 
+import * as config from '../config.json';
+
 export type SayInChatFunc = (message: string) => void;
 
-export const sayInChat:SayInChatFunc = (message: string) => {
-  client.say('itsdece', message);
+export const sayInChat: SayInChatFunc = (message: string) => {
+  client.say(config.channel, message);
   // client.action("itsdece", message);
 }
 

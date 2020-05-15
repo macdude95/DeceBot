@@ -1,22 +1,23 @@
 import { Client, Options } from "tmi.js";
 
 import * as twitchPermissionsTokens from '../twitchPermissionsTokens.json';
+import * as config from '../config.json';
 
-export const botName = 'DeceBot';
+export const botName = config.botName;
 
-const tmiOptions:Options = {
+const tmiOptions: Options = {
   options: {
-    debug: false,
+    debug: true,
   },
   connection: {
     reconnect: true,
   },
   identity: {
     username: botName,
-    password: twitchPermissionsTokens[botName],
+    password: config.twitchToken,
   },
-  channels: ['itsdece'],
+  channels: config.channels,
 };
 
-export const client = new (Client as unknown as {new(opts:Options):Client})(tmiOptions);
+export const client = new (Client as unknown as { new(opts: Options): Client })(tmiOptions);
 export default client;

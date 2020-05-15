@@ -13,6 +13,7 @@ process.on('unhandledRejection', (reason, p) => {
 const obsController = new OBSController();
 if (argv.slippi) {
   console.log('String slippi task...');
+  // Does this do anything?
   const slippi = new Slippi('D:\\Games\\Dolphin\\Slippi\\Games', obsController);
 }
 
