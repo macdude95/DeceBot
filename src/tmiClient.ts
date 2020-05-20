@@ -1,6 +1,5 @@
 import { Client, Options } from "tmi.js";
 
-import * as twitchPermissionsTokens from '../twitchPermissionsTokens.json';
 import * as config from '../config.json';
 
 export const botName = config.botName;
