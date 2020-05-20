@@ -4,7 +4,7 @@ import Command from './Command';
 import SayCommand from "./SayCommand";
 import SoundCommand from "./SoundCommand";
 import { sayInChat } from "../utils";
-import * as config from '../../config.json';
+import config from '../config';
 
 export { Command, SayCommand, SoundCommand };
 

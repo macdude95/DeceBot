@@ -3,7 +3,7 @@ import { SayInChatFunc } from "../utils";
 
 import Command from './Command';
 import soundPlayer from 'sound-play';
-import * as config from '../../config.json';
+import config from '../config';
 
 export default class SoundCommand extends Command {
     sayInChat: SayInChatFunc

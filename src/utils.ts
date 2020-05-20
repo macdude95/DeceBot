@@ -1,7 +1,7 @@
 import { client } from "./tmiClient";
 import { commands } from "./commands";
 
-import * as config from '../config.json';
+import config from './config';
 
 export type SayInChatFunc = (message: string) => void;
 

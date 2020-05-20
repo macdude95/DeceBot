@@ -3,7 +3,7 @@ import say from 'say';
 import { Userstate } from 'tmi.js';
 import { SayInChatFunc } from '../utils';
 
-import * as config from '../../config.json';
+import config from '../config';
 
 const channel = config.channel;
 
