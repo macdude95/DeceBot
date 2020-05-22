@@ -1,31 +1,19 @@
-import { Userstate } from "tmi.js";
-import { SayInChatFunc } from "../utils";
+import { ChatUserstate } from "tmi.js";
 
 import Command from './Command';
 import soundPlayer from 'sound-play';
-import config from '../config';
 
 export default class SoundCommand extends Command {
-    sayInChat: SayInChatFunc
     filePath: string
 
-    constructor(command: string, filePath: string, sayInChat: SayInChatFunc, isSubOnly: boolean) {
-        super(command, sayInChat, [], isSubOnly);
+    constructor(command: string, filePath: string) {
+        super(command);
         this.filePath = filePath;
-        this.sayInChat = sayInChat;
     }
 
-    execute(userstate: Userstate, message: string) {
-        const username = userstate.username;
+    public execute = async (userstate: ChatUserstate, message: string) => {
         const filePath = this.filePath;
-        if (username == config.botName) {
-            return;
-        }
-        if (!this.isAllowedFor(userstate)) {
-            this.sayInChat(`Yo ${username}, you are not allowed to use this command: ${this.command}`);
-            return;
-        }
 
-        soundPlayer.play(filePath);
+        await soundPlayer.play(filePath);
     }
 }

@@ -48,6 +48,21 @@ export interface Config {
    * -1 mean unlimited
    */
   maxSayQueue: number;
+
+  /**
+   *  Max amount of time to allow a !say command to go on for
+   */
+  sayTimeout: number;
+
+  /**
+   * Time between queued !say commands
+   */
+  saySpacing: number
+
+  /**
+   * The amount of time a user must wait between !say commands
+   */
+  sayThrottleTime: number;
 }
 
 type ConfigFile = Partial<Config>;
@@ -58,7 +73,10 @@ const defaultConfig: Partial<Config> = {
   botName: 'decebot',
   sayVoice: 'Microsoft Zira Desktop',
   debug: false,
-  maxSayQueue: -1
+  maxSayQueue: -1,
+  sayThrottleTime: 60000,
+  sayTimeout: 10000,
+  saySpacing: 1000
 };
 
 let configFile: ConfigFile;

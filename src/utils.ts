@@ -18,3 +18,5 @@ export const findCommandInMessage = (message: string) => {
   }
   return null;
 }
+
+export const sleep = (duration:number) => new Promise(resolve => setTimeout(resolve, duration));

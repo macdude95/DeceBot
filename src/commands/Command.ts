@@ -1,36 +1,12 @@
-import {Userstate} from 'tmi.js';
+import {ChatUserstate} from 'tmi.js';
 
-export type CommandBody = (...args:any) => void;
+export default abstract class Command {
+    public command: string;
 
-export default class Command {
-    isSubOnly: boolean;
-    command: string;
-    closure: () => void;
-    userPermissionsList: string[];
-
-    constructor(command: string, closure: CommandBody, userPermissionsList=[], isSubOnly=false) {
-        this.isSubOnly = isSubOnly;
+    public constructor(command: string) {
         this.command = command;
-        this.closure = closure;
-        this.userPermissionsList = userPermissionsList;
     }
 
-    isAllowedFor(userstate: Userstate): boolean {
-        const username = userstate.username;
-        if (this.isSubOnly && !userstate.subscriber) {
-            return false;
-        }
-        if (!this.userPermissionsList.length) {
-            return true;
-        }
-        return this.userPermissionsList.includes(username);
-    }
+    public abstract async execute(userstate: ChatUserstate, message: string): Promise<void>
 
-    execute(userstate: Userstate, message: string): void {
-        const username = userstate.username;
-        if (!this.isAllowedFor(username)) {
-            return;
-        }
-        this.closure();
-    }
 }

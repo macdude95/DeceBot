@@ -3,6 +3,7 @@ import Slippi from './Slippi';
 import { client } from './tmiClient';
 import { sayInChat, findCommandInMessage } from './utils';
 import { argv } from './commandLine';
+import config from './config';
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (reason, p) => {
@@ -24,6 +25,10 @@ client.on('connected', function (a, p) {
 
 
 client.on('chat', function (channel, userstate, message, self) {
+  if (userstate.username === config.botName) {
+    return;
+  }
+
   const command = findCommandInMessage(message);
   if (command) {
     command.execute(userstate, message);
