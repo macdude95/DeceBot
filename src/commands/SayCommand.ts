@@ -1,72 +1,83 @@
-import Command from './Command';
 import say from 'say';
-import { Userstate } from 'tmi.js';
-import { SayInChatFunc } from '../utils';
+import { ChatUserstate } from 'tmi.js';
+import { promisify } from 'util';
 
-import * as config from '../../config.json';
+import Command from './Command';
+import { sayInChat } from '../utils';
 
-const channel = config.channel;
+import config from '../config';
 
-interface SayTimeouts {
-    [username: string]: number
-}
+
+const speak = promisify(say.speak.bind(say));
 
 interface SayLengthPermissions {
     [username: string]: number
 }
 
-const sayTimeout = 60000;
-const sayTimeoutRecord: SayTimeouts = {};
-const sayLengthPermissions: SayLengthPermissions = {
-    channel: 0,
-}
+type SpeechAssist = [string, string];
+
+const speechAssistReplacements:SpeechAssist[] = [
+    ['decebot', 'dece bot'],
+    ['dece', 'deese'],
+    ['nani', 'naw knee']
+]
 
 export default class SayCommand extends Command {
-    sayInChat: SayInChatFunc;
-
-    constructor(command: string, sayInChat: SayInChatFunc, userPermissionsList = []) {
-        super(command, sayInChat, userPermissionsList);
-
-        this.sayInChat = sayInChat;
+    // This is a theoretical memory leak since we are never removing records from here.
+    // It's probably fine
+    private readonly sayLengthPermissions: SayLengthPermissions = {
+        [config.channel]: 0,
     }
 
-    execute(userstate: Userstate, message: string) {
-        const username = userstate.username;
-        const sayInChat = this.sayInChat;
-        const say_text = message.toLowerCase().replace("!say", "").replace("decebot", "dece bot").replace("dece", "deese");
-        if (!say_text.length || username == config.botName) {
+    constructor(command: string) {
+        super(command);
+    }
+
+    public execute = async (user: ChatUserstate, message: string) => {
+        const sayText = this.parseCommand(message);
+        if (!sayText.length) {
             return;
         }
-        if (sayTimeoutRecord[username]) {
-            const lastTime = sayTimeoutRecord[username];
-            const elapsedTime = Date.now() - lastTime;
-            if (elapsedTime < sayTimeout && !userstate.mod) {
-                sayInChat(`Yo ${username}, chill out with the !say command for at least another ${Math.ceil((sayTimeout - elapsedTime) / 1000)} seconds`);
-                return;
-            } else {
 
-            }
-        }
-        sayTimeoutRecord[username] = Date.now();
-        say.speak(say_text, config.sayVoice, 1.0, function (err) { // "Microsoft Zira Desktop"
-            if (err) {
-                console.log(`FAILED attempt to speak: ${say_text}`)
-            } else {
-                console.log(`SUCCESS text to speech: ${say_text}`)
-            }
-            delete sayTimeoutRecord[username];
-        });
+        const username = user.username as string;
 
-        const timeout = sayLengthPermissions.hasOwnProperty(username) ? sayLengthPermissions[username] : 10000;
+        const maxSayDuration = this.sayLengthPermissions.hasOwnProperty(username) ? this.sayLengthPermissions[username] : config.sayTimeout;
+        // const maxSayDuration = config.sayTimeout;
 
-        if (timeout > 0) {
-            setTimeout(() => {
-                say.stop((err) => {
-                    if (!err) {
+        let cutoffMessage: NodeJS.Timeout|undefined = undefined;
+        let speaking = true;
+        if (maxSayDuration > 0) {
+            cutoffMessage = setTimeout(() => {
+                say.stop(err => {
+                    if (!err && speaking) {
                         sayInChat(`@${username} your message was too long so I had to cut off.`);
                     }
                 });
-            }, timeout)
+            }, maxSayDuration);
         }
+
+        try {
+            await speak(sayText, config.sayVoice, 1.0);
+        } catch (err) {
+            console.log(`FAILED text to speech: ${sayText}`)
+            if (config.debug) {
+                console.error(err);
+            }
+            return;
+        } finally {
+            speaking = false;
+            if(cutoffMessage) {
+                clearTimeout(cutoffMessage);
+            }
+        }
+
+        console.log(`SUCCESS text to speech: ${sayText}`)
+    }
+
+    private parseCommand = (rawText: string): string => {
+        return speechAssistReplacements.reduce(
+            (str, replacement) => str.replace(replacement[0], replacement[1]),
+                rawText.toLowerCase().slice('!say'.length).trim()
+        ).trim();
     }
 }

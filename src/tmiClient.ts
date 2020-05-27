@@ -1,12 +1,12 @@
 import { Client, Options } from "tmi.js";
 
-import * as config from '../config.json';
+import config from './config';
 
 export const botName = config.botName;
 
 const tmiOptions: Options = {
   options: {
-    debug: true,
+    debug: config.debug,
   },
   connection: {
     reconnect: true,

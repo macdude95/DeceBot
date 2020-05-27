@@ -4,31 +4,34 @@ import Command from './Command';
 import SayCommand from "./SayCommand";
 import SoundCommand from "./SoundCommand";
 import { sayInChat } from "../utils";
-import * as config from '../../config.json';
+import config from '../config';
+import SimpleCommand from "./SimpleCommand";
+import { subOnly, throttle, queued } from "./decorators";
 
 export { Command, SayCommand, SoundCommand };
 
-export const commands = [
+export const commands: Command[] = [
   // Text to speech command:
-  new SayCommand('!Say', (message) => {
-    sayInChat(message);
-  }),
+  throttle(
+    queued(new SayCommand('!Say')),
+    { waitTime: config.sayThrottleTime }
+  ),
 
   // DeceBot text commands:
-  new Command('!Discord', () => {
+  new SimpleCommand('!Discord', () => {
     sayInChat('Join the discord here: https://discord.gg/65jUQ8G');
   }),
-  new Command('!Github', () => {
+  new SimpleCommand('!Github', () => {
     sayInChat(
       'Wanna see what my insides look like? https://github.com/micantre/DeceBot'
     );
   }),
-  new Command('!CupheadWars', () => {
+  new SimpleCommand('!CupheadWars', () => {
     sayInChat(
       'The great Cuphead Wars of 2020 is a competition between me and a couple of my coworkers to see who can beat cuphead the fastest. Others in the competition are https://www.twitch.tv/kishkishftw and https://www.twitch.tv/faultymuse'
     );
   }),
-  new Command('!NewSoundboard', () => {
+  new SimpleCommand('!NewSoundboard', () => {
     sayInChat(
       'The subscriber sound effect commands are now shared in one collective subscriber soundboard.'
     );
@@ -44,6 +47,7 @@ export const commands = [
     path.join(soundBoardPath, 'General'),
     path.join(soundBoardPath, 'SubOnly'),
   ];
+
   try {
     const writePromises: Promise<void>[] = [];
     for (const folderPath of folderPaths) {
@@ -57,7 +61,7 @@ export const commands = [
         const fullPath = path.join(folderPath, file);
         const command = `!${file.split('.')[0]}`;
         commands.push(
-          new SoundCommand(command, fullPath, sayInChat, isSubOnly)
+          subOnly(new SoundCommand(command, fullPath), isSubOnly)
         );
         commandsInFolder.push(command);
       }

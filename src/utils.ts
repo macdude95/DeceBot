@@ -1,7 +1,7 @@
 import { client } from "./tmiClient";
 import { commands } from "./commands";
 
-import * as config from '../config.json';
+import config from './config';
 
 export type SayInChatFunc = (message: string) => void;
 
@@ -18,3 +18,5 @@ export const findCommandInMessage = (message: string) => {
   }
   return null;
 }
+
+export const sleep = (duration:number) => new Promise(resolve => setTimeout(resolve, duration));
