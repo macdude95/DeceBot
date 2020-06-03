@@ -26,7 +26,7 @@ client.on('connected', function (a, p) {
 });
 
 client.on('chat', function (channel, userstate, message, self) {
-  if (userstate.username === config.botName) {
+  if (!(userstate.username)|| userstate.username === config.botName) {
     return;
   }
 

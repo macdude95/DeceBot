@@ -63,6 +63,14 @@ export interface Config {
    * What text to announce in chat when joining a channel
    */
   announceText: string;
+
+  /**
+   * Response to greet user with the first time they talk since Decebot connected.
+   * If an array, will randomly pick a greeting from the list
+   *
+   * Will replace `$user` with the username of the user being greeted
+   */
+  userGreeting: string | string[];
 }
 
 type ConfigFile = Partial<Config>;
@@ -77,7 +85,8 @@ const defaultConfig: Partial<Config> = {
   sayThrottleTime: 60000,
   sayTimeout: 10000,
   saySpacing: 1000,
-  announceText: 'SUP WORLD!'
+  announceText: 'SUP WORLD!',
+  userGreeting: 'Hey, @$user! Welcome to the stream!'
 };
 
 let configFile: ConfigFile;
