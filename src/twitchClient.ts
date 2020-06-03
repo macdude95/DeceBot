@@ -15,7 +15,7 @@ const tmiOptions: Options = {
     username: botName,
     password: config.twitchToken,
   },
-  channels: config.channels,
+  channels: [ config.channel ],
 };
 
 export const client = new (Client as unknown as { new(opts: Options): Client })(tmiOptions);
