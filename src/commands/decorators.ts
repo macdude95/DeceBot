@@ -58,7 +58,8 @@ export const allowedUsers = (inner: Command, allowedUsers: AllowedUsers) => {
 };
 
 export const subOnly = (inner: Command, isSubOnly: boolean = true) => allowedUsers(inner, (user) => {
-    return !!(isSubOnly ? (user.subscriber || user.badges?.subscriber) : true);
+    const isSub = !!(user.subscriber || user.mod || user.badges?.subscriber || user.badges?.founder);
+    return isSubOnly ? isSub : true;
 })
 
 export const throttle = (inner: Command, options: ThrottleOptions): Command => {

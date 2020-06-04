@@ -1,0 +1,12 @@
+diff --git a/node_modules/@types/tmi.js/index.d.ts b/node_modules/@types/tmi.js/index.d.ts
+index 0363842..d41391a 100644
+--- a/node_modules/@types/tmi.js/index.d.ts
++++ b/node_modules/@types/tmi.js/index.d.ts
+@@ -118,6 +118,7 @@ export interface Badges {
+     staff?: string;
+     turbo?: string;
+     premium?: string;
++    founder?: string;
+ }
+ 
+ export interface SubMethods {

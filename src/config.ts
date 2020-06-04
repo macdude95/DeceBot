@@ -13,11 +13,6 @@ export interface Config {
   channel: string;
 
   /**
-   * Channels to connect to
-   */
-  channels: string[];
-
-  /**
    * TTS Voice to use
    */
   sayVoice: string;
@@ -63,6 +58,19 @@ export interface Config {
    * The amount of time a user must wait between !say commands
    */
   sayThrottleTime: number;
+
+  /**
+   * What text to announce in chat when joining a channel
+   */
+  announceText: string;
+
+  /**
+   * Response to greet user with the first time they talk since Decebot connected.
+   * If an array, will randomly pick a greeting from the list
+   *
+   * Will replace `$user` with the username of the user being greeted
+   */
+  userGreeting: string | string[];
 }
 
 type ConfigFile = Partial<Config>;
@@ -76,7 +84,9 @@ const defaultConfig: Partial<Config> = {
   maxSayQueue: -1,
   sayThrottleTime: 60000,
   sayTimeout: 10000,
-  saySpacing: 1000
+  saySpacing: 1000,
+  announceText: 'SUP WORLD!',
+  userGreeting: 'Hey, @$user! Welcome to the stream!'
 };
 
 let configFile: ConfigFile;
@@ -94,10 +104,6 @@ try {
 }
 
 const config = { ...defaultConfig, ...configFile } as Config;
-
-if (!Array.isArray(config.channels)) {
-  config.channels = [ config.channel ]
-}
 
 const providedKeys = new Set(Object.keys(config));
 

@@ -1,6 +1,6 @@
 import OBSController from './OBSController';
 import Slippi from './Slippi';
-import { client } from './tmiClient';
+import { client } from './twitchClient';
 import { sayInChat, findCommandInMessage } from './utils';
 import { argv } from './commandLine';
 import config from './config';
@@ -20,12 +20,13 @@ if (argv.slippi) {
 // These handlers could arguably be move to tmiClient.ts
 // We'll leave them here for now
 client.on('connected', function (a, p) {
-  sayInChat('SUP WORLD!');
+  if (config.announceText) {
+    sayInChat(config.announceText);
+  }
 });
 
-
 client.on('chat', function (channel, userstate, message, self) {
-  if (userstate.username === config.botName) {
+  if (!(userstate.username)|| userstate.username === config.botName) {
     return;
   }
 
