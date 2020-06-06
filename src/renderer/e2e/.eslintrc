@@ -1,0 +1,6 @@
+{
+  "extends": "../../../.eslintrc",
+  "parserOptions": {
+    "project": ["src/renderer/e2e/tsconfig.e2e.json"]
+  }
+}
