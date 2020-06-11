@@ -36,6 +36,16 @@ export const commands: Command[] = [
       'The subscriber sound effect commands are now shared in one collective subscriber soundboard.'
     );
   }),
+  new SimpleCommand('!PBs', () => {
+    sayInChat(
+      'Wanna check out my PBs then go to https://www.speedrun.com/user/Dece'
+    );
+  }),
+  new SimpleCommand('!Commands', () => {
+    sayInChat(
+      'Wanna check out my Commands then go to https://shorturl.at/rCU47'
+    );
+  }),
 
   // Sound commands are automatically added in the code below
 ];
