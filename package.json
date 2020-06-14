@@ -1,7 +1,7 @@
 {
   "name": "decebot",
   "version": "1.0.0",
-  "main": "dist/main/main.js",
+  "main": "dist/main/electron-main.js",
   "description": "A bot for twitch.tv/itsdece",
   "author": {
     "name": "ItsDece"
@@ -11,12 +11,13 @@
     "ng": "ng",
     "start": "npm-run-all -p electron:serve ng:serve",
     "serve": "electron . --serve",
-    "build": "npm run electron:serve-tsc && ng build --base-href ./",
+    "build": "npm run build:prod",
+    "build:run": "npm run electron:serve-tsc && ng build --base-href ./",
     "build:dev": "npm run build -- -c dev",
     "build:prod": "npm run build -- -c production",
     "ng:serve": "ng serve",
     "ng:serve:web": "ng serve -c web -o",
-    "electron:serve-tsc": "tsc -p src/main/tsconfig.json",
+    "electron:serve-tsc": "webpack --config src/main/webpack.main.ts",
     "electron:serve": "wait-on http-get://localhost:4200/ && npm run electron:serve-tsc && electron . --serve",
     "electron:local": "npm run build:prod && electron .",
     "electron:linux": "npm run build:prod && electron-builder build --linux",
@@ -31,9 +32,10 @@
   "private": true,
   "dependencies": {
     "devtron": "^1.4.0",
-    "electron": "^9.0.2",
     "electron-reload": "^1.5.0",
+    "obs-websocket-js": "^4.0.1",
     "say": "^0.16.0",
+    "slp-parser-js": "^4.1.0",
     "sound-play": "^1.0.5",
     "tmi.js": "^1.5.0"
   },
@@ -63,6 +65,7 @@
     "codelyzer": "~5.2.0",
     "core-js": "^3.6.5",
     "cross-env": "^7.0.2",
+    "electron": "^9.0.2",
     "electron-builder": "^22.7.0",
     "electron-prebuilt-compile": "^8.2.0",
     "eslint": "^7.2.0",

@@ -1,12 +1,16 @@
 import { app, BrowserWindow, screen } from 'electron';
-import path = require('path');
-import url = require('url');
+import path from 'path';
+import url from 'url';
+
+import { argv } from './commandLine';
 
 let win: BrowserWindow = null;
-const args = process.argv.slice(1);
-const serve = args.some(val => val === '--serve');
 
-console.log(process.version);
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (reason, p) => {
+  // console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
+  // application specific logging, throwing an error, or other logic here
+});
 
 function createWindow(): BrowserWindow {
   const electronScreen = screen;
@@ -20,11 +24,11 @@ function createWindow(): BrowserWindow {
     height: size.height,
     webPreferences: {
       nodeIntegration: true,
-      allowRunningInsecureContent: serve ? true : false,
+      allowRunningInsecureContent: argv.serve ? true : false,
     },
   });
 
-  if (serve) {
+  if (argv.serve) {
     require('devtron').install();
     win.webContents.openDevTools();
 
@@ -33,13 +37,7 @@ function createWindow(): BrowserWindow {
     });
     win.loadURL('http://localhost:4200');
   } else {
-    win.loadURL(
-      url.format({
-        pathname: path.join(__dirname, '../renderer/index.html'),
-        protocol: 'file:',
-        slashes: true,
-      })
-    );
+    win.loadFile('./dist/renderer/index.html');
   }
 
   // Emitted when the window is closed.

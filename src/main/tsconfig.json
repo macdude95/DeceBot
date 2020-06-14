@@ -5,9 +5,11 @@
     "outDir": "../../dist/main",
     "declaration": false,
     "moduleResolution": "node",
+    "esModuleInterop": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "target": "es5",
+    "module": "CommonJS",
     "types": [
       "node"
     ],
@@ -18,9 +20,9 @@
       "dom"
     ]
   },
-  "files": [
-    "src/main.ts"
-  ],
+  // "files": [
+  //   "src/main.ts"
+  // ],
   "exclude": [
     "node_modules",
     "**/*.spec.ts"

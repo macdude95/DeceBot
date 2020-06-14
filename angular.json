@@ -24,7 +24,7 @@
             }
           },
           "configurations": {
-            "dev": {
+            "development": {
               "optimization": false,
               "outputHashing": "all",
               "sourceMap": true,
@@ -83,7 +83,7 @@
             "browserTarget": "angular-electron:build"
           },
           "configurations": {
-            "dev": {
+            "development": {
               "browserTarget": "angular-electron:build:dev"
             },
             "web": {

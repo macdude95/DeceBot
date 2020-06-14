@@ -1,6 +1,6 @@
-import { Application } from "spectron";
-import electronPath = require("electron"); // Require Electron from the binaries included in node_modules.
-import path = require("path");
+import { Application } from 'spectron';
+import electronPath from 'electron'; // Require Electron from the binaries included in node_modules.
+import path from 'path';
 
 export default function setup(): void {
   beforeEach(async function () {
@@ -12,14 +12,14 @@ export default function setup(): void {
 
       // The following line tells spectron to look and use the main.js file
       // and the package.json located 1 level above.
-      args: [path.join(__dirname, "../../..")],
+      args: [path.join(__dirname, '../../..')],
       webdriverOptions: {},
     });
     await this.app.start();
     const browser = this.app.client;
     await browser.waitUntilWindowLoaded();
 
-    browser.timeouts("script", 15000);
+    browser.timeouts('script', 15000);
   });
 
   afterEach(function () {

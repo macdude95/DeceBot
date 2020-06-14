@@ -1,5 +1,5 @@
-import { client } from "./twitchClient";
-import { commands } from "./commands";
+import { client } from './twitchClient';
+import { commands } from './commands';
 
 import config from './config';
 
@@ -7,7 +7,7 @@ export type SayInChatFunc = (message: string) => void;
 
 export const sayInChat: SayInChatFunc = (message: string) => {
   client.say(config.channel, message);
-}
+};
 
 export const findCommandInMessage = (message: string) => {
   for (const command of commands) {
@@ -16,6 +16,4 @@ export const findCommandInMessage = (message: string) => {
     }
   }
   return null;
-}
-
-export const sleep = (duration:number) => new Promise(resolve => setTimeout(resolve, duration));
+};

@@ -1,7 +1,7 @@
-import type { Configuration } from 'webpack';
-import path = require('path');
+import * as webpack from 'webpack';
+import * as path from 'path';
 
-module.exports = (env): Configuration => {
+export default (env): webpack.Configuration => {
   if (!env) {
     env = 'development';
   }
@@ -10,6 +10,7 @@ module.exports = (env): Configuration => {
       main: './src/main/src/main.ts',
     },
     target: 'electron-main',
+    mode: env,
     output: {
       path: path.resolve(__dirname, '../../dist/main'),
       filename: 'electron-main.js',
@@ -29,8 +30,8 @@ module.exports = (env): Configuration => {
       extensions: ['.js', '.ts', 'json'],
     },
     node: {
-      __dirname: true,
-      __filename: true,
+      __dirname: false,
+      __filename: false,
     },
     plugins: [],
   };

@@ -1,21 +1,20 @@
-import path from "path";
-import fs from "fs";
+import path from 'path';
+import fs from 'fs';
 import Command from './Command';
-import SayCommand from "./SayCommand";
-import SoundCommand from "./SoundCommand";
-import { sayInChat } from "../utils";
+import SayCommand from './SayCommand';
+import SoundCommand from './SoundCommand';
+import { sayInChat } from '../utils';
 import config from '../config';
-import SimpleCommand from "./SimpleCommand";
-import { subOnly, throttle, queued } from "./decorators";
+import SimpleCommand from './SimpleCommand';
+import { subOnly, throttle, queued } from './decorators';
 
 export { Command, SayCommand, SoundCommand };
 
 export const commands: Command[] = [
   // Text to speech command:
-  throttle(
-    queued(new SayCommand('!Say')),
-    { waitTime: config.sayThrottleTime }
-  ),
+  throttle(queued(new SayCommand('!Say')), {
+    waitTime: config.sayThrottleTime,
+  }),
 
   // DeceBot text commands:
   new SimpleCommand('!Discord', () => {
@@ -69,15 +68,15 @@ export const commands: Command[] = [
         }
         const fullPath = path.join(folderPath, file);
         const command = `!${file.split('.')[0]}`;
-        commands.push(
-          subOnly(new SoundCommand(command, fullPath), isSubOnly)
-        );
+        commands.push(subOnly(new SoundCommand(command, fullPath), isSubOnly));
         commandsInFolder.push(command);
       }
-      writePromises.push(fs.promises.writeFile(
-        path.join(folderPath, 'Commands.txt'),
-        commandsInFolder.join('\n')
-      ))
+      writePromises.push(
+        fs.promises.writeFile(
+          path.join(folderPath, 'Commands.txt'),
+          commandsInFolder.join('\n')
+        )
+      );
     }
     await Promise.all(writePromises);
   } catch (e) {
@@ -86,9 +85,12 @@ export const commands: Command[] = [
     console.log('Loaded all sound commands in %s', soundBoardPath);
     // Write all commands to file
     // TODO: denote sub only commands
-    fs.writeFile(config.commandsPath, commands.map(c => c.command).join(" - ") + " - ", (error) => { });
-
+    fs.writeFile(
+      config.commandsPath,
+      commands.map(c => c.command).join(' - ') + ' - ',
+      error => {}
+    );
   }
 })();
 
-export default commands
+export default commands;

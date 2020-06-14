@@ -1,39 +1,24 @@
 import OBSController from './OBSController';
 import Slippi from './Slippi';
 import { client } from './twitchClient';
-import { sayInChat, findCommandInMessage } from './utils';
 import { argv } from './commandLine';
-import config from './config';
 
-// Handle unhandled promise rejections
-process.on('unhandledRejection', (reason, p) => {
-  // console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
-  // application specific logging, throwing an error, or other logic here
-});
+export class DeceBot {
+  private readonly slippi: Slippi | undefined;
 
-const obsController = new OBSController();
-if (argv.slippi) {
-  console.log('String slippi task...');
-  const slippi = new Slippi('D:\\Games\\Dolphin\\Slippi\\Games', obsController);
+  constructor(runSlippi: boolean) {
+    if (runSlippi) {
+      const obsController = new OBSController();
+      this.slippi = new Slippi(
+        'D:\\Games\\Dolphin\\Slippi\\Games',
+        obsController
+      );
+    }
+  }
+
+  async connect(): Promise<void> {
+    await client.connect();
+  }
 }
 
-// These handlers could arguably be move to tmiClient.ts
-// We'll leave them here for now
-client.on('connected', function (a, p) {
-  if (config.announceText) {
-    sayInChat(config.announceText);
-  }
-});
-
-client.on('chat', function (channel, userstate, message, self) {
-  if (!(userstate.username)|| userstate.username === config.botName) {
-    return;
-  }
-
-  const command = findCommandInMessage(message);
-  if (command) {
-    command.execute(userstate, message);
-  }
-});
-
-client.connect();
+export const decebot = new DeceBot(argv.slippi);
