@@ -1,5 +1,5 @@
 import { safeLoad } from 'js-yaml';
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
 
 export interface Config {
   /**
@@ -99,8 +99,14 @@ let configFile: ConfigFile;
 try {
   configFile = require('../../config.json');
 } catch {
+  let configFilePath = ['./config.yaml', './config.yml'].find(path =>
+    existsSync(path)
+  );
   try {
-    configFile = safeLoad(readFileSync('./config.yaml', 'utf8'));
+    if (!configFilePath) {
+      throw new Error('No config file found.');
+    }
+    configFile = safeLoad(readFileSync(configFilePath), 'utf8');
   } catch (e) {
     console.error(
       'No config file found. Please create config.json or config.yaml'
@@ -108,13 +114,15 @@ try {
     console.error(e);
     process.exit(1);
   }
+  if (!configFilePath) {
+  }
 }
 
 const config = { ...defaultConfig, ...configFile } as Config;
 
 const providedKeys = new Set(Object.keys(config));
 
-const missingKeys = requiredKeys.filter((k) => !providedKeys.has(k));
+const missingKeys = requiredKeys.filter(k => !providedKeys.has(k));
 
 if (missingKeys.length > 0) {
   console.error(

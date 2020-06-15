@@ -1,8 +1,10 @@
-import { app, BrowserWindow, screen } from 'electron';
-import path from 'path';
-import url from 'url';
+import { app, BrowserWindow, screen, ipcMain } from 'electron';
 
 import { argv } from './commandLine';
+import initIpc from './ipc';
+import { TypedIpcMain } from 'src/ipc-dtos';
+
+initIpc(ipcMain as TypedIpcMain);
 
 let win: BrowserWindow = null;
 
@@ -13,6 +15,9 @@ process.on('unhandledRejection', (reason, p) => {
 });
 
 function createWindow(): BrowserWindow {
+  // decebot.connect();
+  // return;
+
   const electronScreen = screen;
   const size = electronScreen.getPrimaryDisplay().workAreaSize;
 
@@ -32,9 +37,10 @@ function createWindow(): BrowserWindow {
     require('devtron').install();
     win.webContents.openDevTools();
 
-    require('electron-reload')(__dirname, {
-      electron: path.join(__dirname, '../../node_modules/.bin/electron'),
-    });
+    // FIXME Should probably figure out why this doesn't work and fix it.
+    // require('electron-reload')(path.join(__dirname, '../..'), {
+    //   electron: path.join(__dirname, '../../node_modules/.bin/electron'),
+    // });
     win.loadURL('http://localhost:4200');
   } else {
     win.loadFile('./dist/renderer/index.html');

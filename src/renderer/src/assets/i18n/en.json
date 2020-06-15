@@ -8,5 +8,12 @@
       "TITLE": "Detail page !",
       "BACK_TO_HOME": "Back to Home"
     }
+  },
+  "COMPONENTS": {
+    "CONNECT_WIDGET": {
+      "CONNECTED": "Connected",
+      "DISCONNECTED": "Disconnected",
+      "CONNECTING": "Connecting..."
+    }
   }
 }

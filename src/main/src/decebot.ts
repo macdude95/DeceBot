@@ -19,6 +19,10 @@ export class DeceBot {
   async connect(): Promise<void> {
     await client.connect();
   }
+
+  async disconnect(): Promise<void> {
+    await client.disconnect();
+  }
 }
 
 export const decebot = new DeceBot(argv.slippi);

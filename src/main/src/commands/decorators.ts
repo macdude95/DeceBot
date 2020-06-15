@@ -4,7 +4,7 @@ import { ChatUserstate } from 'tmi.js';
 import { sayInChat } from '../utils';
 import { EventEmitter } from 'events';
 import config from '../config';
-import { sleep } from 'src/shared/utils';
+import { sleep } from '../../../shared/utils';
 
 interface SayTimeouts {
   [username: string]: number;

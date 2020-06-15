@@ -9,7 +9,7 @@
       "projectType": "application",
       "architect": {
         "build": {
-          "builder": "@angular-builders/custom-webpack:browser",
+          "builder": "@angular-devkit/build-angular:browser",
           "options": {
             "outputPath": "dist/renderer",
             "index": "src/renderer/src/index.html",
@@ -18,10 +18,7 @@
             "polyfills": "src/renderer/src/polyfills.ts",
             "assets": ["src/renderer/src/assets"],
             "styles": ["src/renderer/src/styles.scss"],
-            "scripts": [],
-            "customWebpackConfig": {
-              "path": "./angular.webpack.js"
-            }
+            "scripts": []
           },
           "configurations": {
             "development": {
@@ -78,7 +75,7 @@
           }
         },
         "serve": {
-          "builder": "@angular-builders/custom-webpack:dev-server",
+          "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
             "browserTarget": "angular-electron:build"
           },
@@ -101,7 +98,7 @@
           }
         },
         "test": {
-          "builder": "@angular-builders/custom-webpack:karma",
+          "builder": "@angular-devkit/build-angular:karma",
           "options": {
             "main": "src/renderer/src/test.ts",
             "polyfills": "src/renderer/src/polyfills-test.ts",
@@ -109,11 +106,7 @@
             "karmaConfig": "src/renderer/karma.conf.js",
             "scripts": [],
             "styles": ["src/renderer/src/styles.scss"],
-            "assets": ["src/renderer/src/assets"],
-            "customWebpackConfig": {
-              "path": "./angular.webpack.js",
-              "target": "electron-renderer"
-            }
+            "assets": ["src/renderer/src/assets"]
           }
         },
         "lint": {
