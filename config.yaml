@@ -1,7 +1,0 @@
-botName: faulty_bot
-channel: faultymuse
-soundBoardPath: C:\Users\Scott\Desktop\StreamStuff\Media\SoundEffects\SoundBoard
-commandsPath: C:\Users\Scott\Desktop\StreamStuff\Misc\Commands.txt
-twitchToken: oauth:cyo4mplz6mjhr81esibk51rd42tdm3
-debug: true
-announceText: Yo
