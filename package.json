@@ -1,6 +1,6 @@
 {
   "name": "decebot",
-  "version": "1.0.0",
+  "version": "0.1.0-alpha",
   "main": "dist/main/electron-main.js",
   "description": "A bot for twitch.tv/itsdece",
   "author": {

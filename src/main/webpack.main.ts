@@ -15,7 +15,9 @@ export default (env): webpack.Configuration => {
       path: path.resolve(__dirname, '../../dist/main'),
       filename: 'electron-main.js',
     },
-    externals: [],
+    externals: {
+      fsevents: "require('fsevents')",
+    },
     devtool: 'source-map',
     module: {
       rules: [
@@ -23,6 +25,9 @@ export default (env): webpack.Configuration => {
           test: /\.ts?$/,
           loader: 'ts-loader',
           exclude: /node_modules/,
+          options: {
+            configFile: 'src/main/tsconfig.json',
+          },
         },
       ],
     },
