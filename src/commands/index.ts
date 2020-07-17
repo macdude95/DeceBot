@@ -26,14 +26,9 @@ export const commands: Command[] = [
       'Wanna see what my insides look like? https://github.com/micantre/DeceBot'
     );
   }),
-  new SimpleCommand('!CupheadWars', () => {
+  new SimpleCommand('!SoundBoard', () => {
     sayInChat(
-      'The great Cuphead Wars of 2020 is a competition between me and a couple of my coworkers to see who can beat cuphead the fastest. Others in the competition are https://www.twitch.tv/kishkishftw and https://www.twitch.tv/faultymuse'
-    );
-  }),
-  new SimpleCommand('!NewSoundboard', () => {
-    sayInChat(
-      'The subscriber sound effect commands are now shared in one collective subscriber soundboard.'
+      'Use sound board commands to play sound effects in the stream!'
     );
   }),
 
