@@ -1,8 +1,0 @@
-{
-    "botName": "decebot",
-    "channel": "itsdece",
-    "sayVoice": "Microsoft Zira Desktop",
-    "soundBoardPath": "C:\\Users\\Michael\\Desktop\\StreamStuff\\Media\\SoundEffects\\SoundBoard",
-    "commandsPath": "C:\\Users\\Michael\\Desktop\\StreamStuff\\Misc\\Commands.txt",
-    "twitchToken": ""
-}

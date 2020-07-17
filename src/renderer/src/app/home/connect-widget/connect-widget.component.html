@@ -1,0 +1,12 @@
+<mat-card>
+  <h3 class="mat-h3">Decebot Connection Status:</h3>
+  <span>
+    <mat-slide-toggle
+      (change)="onConnectionChange($event)"
+      [disabled]="toggleDisabled"
+      [checked]="connectionStatus"
+    >
+      {{ connectionStatusString | translate }}
+    </mat-slide-toggle>
+  </span>
+</mat-card>

@@ -7,7 +7,7 @@ index c3b6323..86b4fbf 100644
        public export(text: string, voice?: string, speed?: number, filePath?: string, callback?: errorCallback): void;
        public speak(text: string, voice?: string, speed?: number, callback?: errorCallback): void;
 -      public stop(): void;
-+      public stop(callback: (err:any?) => void): void;
++      public stop(callback?: (err:any|undefined) => void): void;
        public getInstalledVoices(callback: errorCallback): void;
      }
    }
